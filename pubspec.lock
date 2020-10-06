@@ -6,7 +6,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "385867c8eb72608d31386bfbd1e97d213d667a94"
+      resolved-ref: b4835b79873fd848f87322557877d9e31b012c84
       url: "git://github.com/erkanmaras/aff.git"
     source: git
     version: "0.1.1"
