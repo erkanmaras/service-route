@@ -6,4 +6,4 @@ export 'app_string.dart';
 export 'l10n/localizer.dart';
 export 'error/error_localizer.dart';
 export 'error/error_reporter.dart';
- 
+export 'package:aff/infrastructure.dart';
