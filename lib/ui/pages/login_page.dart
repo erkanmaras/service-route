@@ -36,41 +36,45 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: appTheme.colors.canvasLight,
-      body: SafeArea(
-        child: ScrollConfiguration(
-          behavior: RemoveEffectScrollBehavior(),
-          child: CustomScrollView(
-            slivers: [
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Column(
-                  children: [
-                    _LoginHeader(),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          _LoginBody(),
-                        ],
-                      ),
-                    ),
-                    Visibility(
-                      visible: true,
-                      child: _LoginFooter(),
-                    )
-                  ],
-                ),
-              )
-            ],
-          ),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle(
+          statusBarIconBrightness: Brightness.dark,
         ),
-      ),
-    );
+        child: Scaffold(
+          backgroundColor: appTheme.colors.canvasLight,
+          body: SafeArea(
+            child: ScrollConfiguration(
+              behavior: RemoveEffectScrollBehavior(),
+              child: CustomScrollView(
+                slivers: [
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Column(
+                      children: [
+                        _LoginHeader(),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              _LoginBody(),
+                            ],
+                          ),
+                        ),
+                        Visibility(
+                          visible: true,
+                          child: _LoginFooter(),
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        ));
   }
 }
 
