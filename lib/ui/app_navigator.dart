@@ -1,4 +1,5 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:service_route/ui/pages/home_page.dart';
 
 class AppNavigator {
   //
@@ -9,4 +10,9 @@ class AppNavigator {
 
   static final key = GlobalKey<NavigatorState>();
   static final routeObserver = RouteObserver<PageRoute>();
+
+  Future<void> pushHome(BuildContext context)
+  {
+    return Navigator.of(context).push(MaterialPageRoute<void>(builder: (context) => HomePage()));
+  }
 }

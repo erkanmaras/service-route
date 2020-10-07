@@ -1,7 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:service_route/ui/ui.dart';
+import 'package:flutter/services.dart';
 import 'package:service_route/infrastructure/infrastructure.dart';
+import 'package:service_route/ui/ui.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -9,6 +10,14 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  _LoginPageState()
+      : navigator = AppService.get<AppNavigator>(),
+        logger = AppService.get<Logger>();
+
+  AppTheme appTheme;
+  AppNavigator navigator;
+  Logger logger;
+
   @override
   void initState() {
     super.initState();
@@ -20,72 +29,53 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    appTheme = context.getTheme();
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kWhite,
+      backgroundColor: appTheme.colors.canvasLight,
       body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              height: 300,
-              child: Stack(
-                children: <Widget>[
-                  ClipPath(
-                    clipper: HeaderClipper(
-                      yLine: 200,
-                      y1Bezier: 220,
-                      y2bezier: 84,
-                    ),
-                    child: Container(
-                      color: kGrey,
-                    ),
-                  ),
-                  ClipPath(
-                    clipper: HeaderClipper(
-                      yLine: 180,
-                      y1Bezier: 210,
-                      y2bezier: 82,
-                    ),
-                    child: Container(
-                      color: kBlue,
-                    ),
-                  ),
-                  ClipPath(
-                    clipper: HeaderClipper(
-                      yLine: 160,
-                      y1Bezier: 200,
-                      y2bezier: 80,
-                    ),
-                    child: Container(
-                      color: kWhite,
-                    ),
-                  ),
-                  Header(),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
+        child: ScrollConfiguration(
+          behavior: RemoveEffectScrollBehavior(),
+          child: CustomScrollView(
+            slivers: [
+              SliverFillRemaining(
+                hasScrollBody: false,
                 child: Column(
-                  children: <Widget>[
-                    LoginForm(),
+                  children: [
+                    _LoginHeader(),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          _LoginBody(),
+                        ],
+                      ),
+                    ),
+                    Visibility(
+                      visible: true,
+                      child: _LoginFooter(),
+                    )
                   ],
                 ),
-              ),
-            ),
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class HeaderClipper extends CustomClipper<Path> {
-  const HeaderClipper({
+class _HeaderClipper extends CustomClipper<Path> {
+  const _HeaderClipper({
     @required this.yLine,
     @required this.y1Bezier,
     @required this.y2bezier,
@@ -115,276 +105,236 @@ class HeaderClipper extends CustomClipper<Path> {
   }
 }
 
-class CustomInputField extends StatelessWidget {
-  const CustomInputField({
-    @required this.label,
-    @required this.prefixIcon,
-    this.obscureText = false,
-  })  : assert(label != null),
-        assert(prefixIcon != null);
+class _LoginHeader extends StatelessWidget {
+  const _LoginHeader();
 
-  final String label;
+  @override
+  Widget build(BuildContext context) {
+    var appTheme = context.getTheme();
+    return Container(
+      height: 180,
+      child: Stack(
+        children: <Widget>[
+          ClipPath(
+            clipper: _HeaderClipper(
+              yLine: 170,
+              y1Bezier: 190,
+              y2bezier: 54,
+            ),
+            child: Container(
+              color: Color(0xFFF4F5F7),
+            ),
+          ),
+          ClipPath(
+            clipper: _HeaderClipper(
+              yLine: 150,
+              y1Bezier: 180,
+              y2bezier: 52,
+            ),
+            child: Container(
+              color: appTheme.colors.primary,
+            ),
+          ),
+          ClipPath(
+            clipper: _HeaderClipper(
+              yLine: 130,
+              y1Bezier: 170,
+              y2bezier: 50,
+            ),
+            child: Container(
+              color: appTheme.colors.canvasLight,
+            ),
+          ),
+          Align(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 30),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        'Servis Rota',
+                        style: Theme.of(context).textTheme.headline5.copyWith(
+                            color: Colors.black, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '            by Öz Ata Tur',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            .copyWith(color: Colors.black.withOpacity(0.5)),
+                      ),
+                    ],
+                  ),
+                ),
+                Align(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20, bottom: 20),
+                    child: Transform.rotate(
+                      angle: -pi / -4,
+                      child: Icon(
+                        AppIcons.mapMarkerMultipleOutline,
+                        color: appTheme.colors.primary,
+                        size: 80,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LoginBody extends StatefulWidget {
+  @override
+  _LoginBodyState createState() => _LoginBodyState();
+}
+
+class _LoginBodyState extends State<_LoginBody> {
+  final tecUserName = TextEditingController();
+  final tecPassword = TextEditingController();
+  final fnUserName = FocusNode();
+  final fnPassword = FocusNode();
+  bool isPasswordVisible = false;
+
+  Localizer localizer;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var appTheme = context.getTheme();
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30),
+      child: Column(
+        children: <Widget>[
+          Text('Kullanıcı Girişi', style: appTheme.textStyles.title),
+          SizedBox(height: 10),
+          Divider(),
+          SizedBox(height: 20),
+          _LoginFormInput(
+            hintText: 'Kullanıcı Adı',
+            prefixIcon: AppIcons.account,
+            focusNode: fnUserName,
+            inputFormatters: [LengthLimitingTextInputFormatter(15)],
+            onFieldSubmitted: (value) {
+              context.getFocusScope().requestFocus(fnPassword);
+            },
+            textInputAction: TextInputAction.next,
+            controller: tecUserName,
+          ),
+          _LoginFormInput(
+            focusNode: fnPassword,
+            hintText: 'Şifre',
+            prefixIcon: AppIcons.keyVariant,
+            controller: tecPassword,
+            textInputAction: TextInputAction.done,
+            inputFormatters: [LengthLimitingTextInputFormatter(30)],
+            obscureText: isPasswordVisible,
+            suffixIcon: isPasswordVisible ? AppIcons.eye : AppIcons.eyeOff,
+            onTabSuffixIcon: () {
+              setState(() {
+                isPasswordVisible = !isPasswordVisible;
+              });
+            },
+          ),
+          Divider(),
+          SizedBox(height: 10),
+          Container(
+            height: 40,
+            child: ProgressButton(
+                indicatorColor: appTheme.colors.canvasLight,
+                onPressed:
+                    (startProgressing, stopProgressing, isProgressing) async {
+                  startProgressing();
+                  await Future<void>.delayed(Duration(seconds: 2));
+                  stopProgressing();
+                  await AppService.get<AppNavigator>().pushHome(context);
+                },
+                child: Text('Giriş')),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LoginFooter extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        height: 80,
+        color: Color(0xFFF4F5F7),
+        child: ClipPath(
+          clipper: _HeaderClipper(
+            yLine: 60,
+            y1Bezier: 100,
+            y2bezier: 0,
+          ),
+          child: Container(
+            color: Colors.white,
+          ),
+        ));
+  }
+}
+
+class _LoginFormInput extends StatelessWidget {
+  _LoginFormInput(
+      {this.hintText,
+      this.prefixIcon,
+      this.suffixIcon,
+      this.onTabSuffixIcon,
+      this.focusNode,
+      this.controller,
+      this.inputFormatters,
+      this.obscureText = false,
+      this.textInputAction,
+      this.onFieldSubmitted});
+
+  final String hintText;
   final IconData prefixIcon;
+  final VoidCallback onTabSuffixIcon;
+  final IconData suffixIcon;
+  final FocusNode focusNode;
+  final TextEditingController controller;
+  final List<TextInputFormatter> inputFormatters;
+  final TextInputAction textInputAction;
+  final ValueChanged<String> onFieldSubmitted;
   final bool obscureText;
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      decoration: InputDecoration(
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.black.withOpacity(0.12),
-          ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.black.withOpacity(0.12),
-          ),
-        ),
-        hintText: label,
-        hintStyle: TextStyle(
-          color: kBlack.withOpacity(0.5),
-          fontWeight: FontWeight.w500,
-        ),
-        prefixIcon: Icon(
-          prefixIcon,
-          color: kBlack.withOpacity(0.5),
-        ),
-      ),
+    var appTheme = context.getTheme();
+    var localizer = context.getLocalizer();
+    var suffixIconWidget = suffixIcon != null
+        ? FieldButton(
+            onTab: onTabSuffixIcon,
+            iconData: suffixIcon,
+            iconEnabledColor: Colors.white54)
+        : null;
+    return TextFormField(
+      decoration: DenseInputDecoration(
+          hintText: hintText,
+          helperText: ' ',
+          prefixIcon: Icon(prefixIcon,
+              color: appTheme.colors.primary.lighten(0.2), size: 18),
+          suffixIcon: suffixIconWidget),
+      focusNode: focusNode,
+      validator: RequiredValidator<String>(errorText: localizer.requiredValue),
+      inputFormatters: inputFormatters,
+      textInputAction: TextInputAction.done,
+      controller: controller,
       obscureText: obscureText,
+      onFieldSubmitted: onFieldSubmitted,
     );
-  }
-}
-
-class Header extends StatelessWidget {
-  const Header();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Logo(
-            color: kBlue,
-            size: 48,
-          ),
-          const SizedBox(height: kSpaceM),
-          Text(
-            'Servis Rotası',
-            style: Theme.of(context)
-                .textTheme
-                .headline5
-                .copyWith(color: kBlack, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: kSpaceS),
-          Text(
-            '                      by Öz ata Tur',
-            style: Theme.of(context)
-                .textTheme
-                .bodyText1
-                .copyWith(color: kBlack.withOpacity(0.5)),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Colors
-const Color kBlue = Color(0xFF306EFF);
-const Color kLightBlue = Color(0xFF4985FD);
-const Color kDarkBlue = Color(0xFF1046B3);
-const Color kWhite = Color(0xFFFFFFFF);
-const Color kGrey = Color(0xFFF4F5F7);
-const Color kBlack = Color(0xFF2D3243);
-
-// Spacing
-const double kSpaceS = 8;
-const double kSpaceM = 16;
-
-class Logo extends StatelessWidget {
-  const Logo({
-    @required this.color,
-    @required this.size,
-  })  : assert(color != null),
-        assert(size != null);
-
-  final Color color;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Transform.rotate(
-      angle: -pi / 4,
-      child: Icon(
-        Icons.format_bold,
-        color: color,
-        size: size,
-      ),
-    );
-  }
-}
-
-class LoginForm extends StatefulWidget {
-  LoginForm();
-
-  @override
-  _LoginFormState createState() => _LoginFormState();
-}
-
-class _LoginFormState extends State<LoginForm> {
-  CodeDescription selectedSearchDropDownValue;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Column(
-        children: <Widget>[
-          Padding(
-              padding: EdgeInsets.all(8),
-              child: SearchDropdownField<CodeDescription>(
-                hintText: 'SearchDropdownField',
-                dialogTitle: 'DialogCaption',
-                onFind: searchDropdownFind,
-                onChanged: (CodeDescription data) {
-                  setState(() {
-                    selectedSearchDropDownValue = data;
-                  });
-                },
-                value: selectedSearchDropDownValue,
-                autofocus: true,
-              )),
-          CustomInputField(
-            label: 'Username or Email',
-            prefixIcon: Icons.person,
-            obscureText: true,
-          ),
-          SizedBox(height: 10),
-          CustomInputField(
-            label: 'Password',
-            prefixIcon: Icons.lock,
-            obscureText: true,
-          ),
-          SizedBox(height: 20),
-          CustomButton(
-            color: kBlue,
-            textColor: kWhite,
-            text: 'Login to continue',
-            onPressed: () {},
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<List<CodeDescription>> searchDropdownFind(String filter) async {
-    List<CodeDescription> list = <CodeDescription>[];
-    list.add(CodeDescription('1', 'AAAAAAAAA'));
-    list.add(CodeDescription('2', 'BBBBBBBBB'));
-    list.add(CodeDescription('3', 'CCCCCCCCC'));
-    list.add(CodeDescription('4', 'DDDDDDDDD'));
-    list.add(CodeDescription('5', 'EEEEEEEEE'));
-    list.add(CodeDescription('6', 'FFFFFFFFF'));
-    if (filter.isNullOrWhiteSpace()) {
-      return list;
-    }
-    return list
-        .where((element) => element.code.containsIgnoreCase(filter))
-        .toList();
-  }
-}
-
-class CustomButton extends StatelessWidget {
-  const CustomButton({
-    @required this.color,
-    @required this.textColor,
-    @required this.text,
-    @required this.onPressed,
-    this.image,
-  })  : assert(color != null),
-        assert(textColor != null),
-        assert(text != null),
-        assert(onPressed != null);
-  final Color color;
-  final Color textColor;
-  final String text;
-  final Widget image;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(
-        minWidth: double.infinity,
-      ),
-      child: image != null
-          ? OutlineButton(
-              color: color,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4),
-              ),
-              onPressed: onPressed,
-              child: Row(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: image,
-                  ),
-                  Text(
-                    text,
-                    style: Theme.of(context).textTheme.subtitle1.copyWith(
-                        color: textColor, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            )
-          : FlatButton(
-              color: color,
-              padding: const EdgeInsets.all(10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4),
-              ),
-              onPressed: onPressed,
-              child: Text(
-                text,
-                style: Theme.of(context)
-                    .textTheme
-                    .subtitle1
-                    .copyWith(color: textColor, fontWeight: FontWeight.bold),
-              ),
-            ),
-    );
-  }
-}
-
-class CodeDescription {
-  CodeDescription(this.code, this.description) {
-    code ??= '';
-    description ??= '';
-  }
-  String code;
-  String description;
-
-  bool containsIgnoreCase(String keyword) {
-    if (keyword.isNullOrEmpty()) {
-      return true;
-    }
-    return code.containsIgnoreCase(keyword) ||
-        description.containsIgnoreCase(keyword);
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      other is CodeDescription && code.equalsIgnoreCase(other.code);
-
-  @override
-  int get hashCode => code.hashCode;
-
-  @override
-  String toString() {
-    return description;
   }
 }
