@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "504520051578",
+    "firebase_url": "https://service-route-38299.firebaseio.com",
+    "project_id": "service-route-38299",
+    "storage_bucket": "service-route-38299.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:504520051578:android:68a8cfa3ec789f666824c3",
+        "android_client_info": {
+          "package_name": "com.servisrotasi.com.service_route"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "504520051578-1f3ot0650k6408m4vjfsmt338b2u3l57.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDR-8Gpb23MLyULbWuqr8Hr-a2iTri6ObY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "504520051578-1f3ot0650k6408m4vjfsmt338b2u3l57.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,19 +1,24 @@
+import 'dart:convert';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:aff/infrastructure.dart';
 import 'package:service_route/infrastructure/infrastructure.dart';
+
 class ErrorReporter {
   static Future<void> initialize() async {
-   // await Firebase.initializeApp();
-    //await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(kReleaseMode);
+    await Firebase.initializeApp();
+    await FirebaseCrashlytics.instance
+        .setCrashlyticsCollectionEnabled(kReleaseMode);
   }
 
   static Future<void> sendErrorLog(LogRecord log) async {
     try {
       await _setGlobals('ErrorLog');
-      // await FirebaseCrashlytics.instance.recordError(
-      //   log.message,
-      //   log.stackTrace,
-      // );
+      await FirebaseCrashlytics.instance.recordError(
+        log.message,
+        log.stackTrace,
+      );
     } catch (e) {
       if (!kReleaseMode) {
         debugPrint(e?.toString() ?? 'Crashlytics sendErrorLog failed!');
@@ -24,12 +29,12 @@ class ErrorReporter {
   static Future<void> sendErrorReport(AppErrorReport errorReport) async {
     try {
       await _setGlobals('ErrorReport');
-      // await FirebaseCrashlytics.instance.recordError(
-      //   errorReport.error,
-      //   errorReport.stackTrace,
-      //   information: [errorReport.context],
-      //   printDetails: false,
-      // );
+      await FirebaseCrashlytics.instance.recordError(
+        errorReport.error,
+        errorReport.stackTrace,
+        information: [errorReport.context],
+        printDetails: false,
+      );
     } catch (e) {
       if (!kReleaseMode) {
         debugPrint(e?.toString() ?? 'Crashlytics sendErrorReport failed!');
@@ -43,17 +48,23 @@ class ErrorReporter {
     var userIdentifier = appContext == null || appContext.user == null
         ? 'unknown'
         : '${appContext.user.userGroupName}\\${appContext.user.userName}';
-    // FirebaseCrashlytics instance = FirebaseCrashlytics.instance;
-    // await instance.setUserIdentifier(userIdentifier);
-    // await instance.setCustomKey('report_type', reportType);
-    // await instance.setCustomKey('device_info', jsonEncode(await AppInfo.getDeviceInfo()));
-    // await instance.setCustomKey('app_info', jsonEncode(await AppInfo.getAppInfo()));
+    FirebaseCrashlytics instance = FirebaseCrashlytics.instance;
+    await instance.setUserIdentifier(userIdentifier);
+    await instance.setCustomKey('report_type', reportType);
+    await instance.setCustomKey(
+        'device_info', jsonEncode(await AppInfo.getDeviceInfo()));
+    await instance.setCustomKey(
+        'app_info', jsonEncode(await AppInfo.getAppInfo()));
   }
 
   //Warning!
   //Exist only for test
   //This method terminates the app
   static Future<void> crash() async {
-    // FirebaseCrashlytics.instance.crash();
+    FirebaseCrashlytics.instance.crash();
+  }
+
+   static Future<void> sendWating() async {
+    await FirebaseCrashlytics.instance.sendUnsentReports();
   }
 }

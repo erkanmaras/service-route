@@ -260,6 +260,7 @@ class _LoginBodyState extends State<_LoginBody> {
                 onPressed:
                     (startProgressing, stopProgressing, isProgressing) async {
                   startProgressing();
+                  await ErrorReporter.sendWating();
                   await Future<void>.delayed(Duration(seconds: 2));
                   stopProgressing();
                   await AppService.get<AppNavigator>().pushHome(context);
