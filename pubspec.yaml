@@ -19,10 +19,16 @@ dependencies:
   path_provider: ^1.6.18
   rxdart: ^0.24.1
   permission_handler: ^5.0.1+1
+  google_maps_flutter: ^1.0.2
   aff:
     path: ../aff/
     # git:
     #   url: git://github.com/erkanmaras/aff.git
+    #   ref: main
+  locator:
+    path: ../locator/
+    # git:
+    #   url: git://github.com/erkanmaras/locator.git
     #   ref: main
 
 dev_dependencies:

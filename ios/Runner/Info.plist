@@ -41,5 +41,20 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<!-- Modified -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
+	 <!-- for iOS 11 + -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>The location information collected will be used to measure the distance traveled.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>The location information collected will be used to measure the distance traveled.</string>
+
+    <!-- additionally for iOS 9/10, if you need always permission -->
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>The location information collected will be used to measure the distance traveled.</string>
+	 <!-- Modified -->
 </dict>
 </plist>
