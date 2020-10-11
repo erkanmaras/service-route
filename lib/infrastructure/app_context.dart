@@ -9,12 +9,10 @@ class AppContext {
 
   void setAppUser(
     AuthenticationToken authToken,
-    String userGroupName,
     String userName,
-    String password,
-    String language,
+    String password
   ) {
-    _user = AppUser(authToken, userGroupName, userName, password, language);
+    _user = AppUser(authToken, userName, password);
   }
 
   AppSettings _appSetting = AppSettings();
@@ -43,13 +41,13 @@ class AppContext {
 }
 
 class AppUser {
-  AppUser(this.authToken, this.userGroupName, this.userName, this.password, this.language);
+  AppUser(this.authToken,  this.userName, this.password );
 
   final AuthenticationToken authToken;
-  final String userGroupName;
+  
   final String userName;
   final String password;
-  final String language;
+  
 }
 
 class AppSettings {

@@ -1,4 +1,4 @@
-class FakeData{
+class FakeData {
   FakeData._();
 
   static String login() {
@@ -7,5 +7,25 @@ class FakeData{
   "validTo": "2020-04-07T10:19:34Z",
   "resultType": 0
 }''';
+  }
+
+  static String serviceRoutes() {
+    return '''[
+  {
+    "description": "Kartal - Pendik"
+  },
+
+   {
+    "description": "Kadıköy - Ümraniye"
+  },
+
+   {
+    "description": "Samandıra - Kartal"
+  },
+
+   {
+    "description": "Maltepe - Gayrettepe"
+  } 
+]''';
   }
 }

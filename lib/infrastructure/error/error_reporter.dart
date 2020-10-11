@@ -47,7 +47,7 @@ class ErrorReporter {
     // ignore: unused_local_variable
     var userIdentifier = appContext == null || appContext.user == null
         ? 'unknown'
-        : '${appContext.user.userGroupName}\\${appContext.user.userName}';
+        : '${appContext.user.userName}';
     FirebaseCrashlytics instance = FirebaseCrashlytics.instance;
     await instance.setUserIdentifier(userIdentifier);
     await instance.setCustomKey('report_type', reportType);

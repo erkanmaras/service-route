@@ -5,12 +5,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:aff/infrastructure.dart';
-import 'package:aff/ui.dart';
 import 'package:service_route/data/data.dart';
-import 'package:service_route/domain/domain.dart';
-import 'package:service_route/infrastructure/infrastructure.dart';
 import 'package:service_route/ui/pages/login_page.dart';
 import 'package:service_route/ui/ui.dart';
+import 'package:service_route/domain/domain.dart';
+import 'package:service_route/infrastructure/infrastructure.dart';
 
 class App {
   void buildAppServices() {
@@ -49,6 +48,10 @@ class App {
 
     AppService.addTransient<ISettingsRepository>(
       () => SettingsRespository(AppService.get<ServiceRouteDb>()),
+    );
+
+    AppService.addTransient<IServiceRouteRepository>(
+      () => ServiceRouteRepository(AppService.get<ServiceRouteApi>()),
     );
   }
 

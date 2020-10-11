@@ -10,8 +10,8 @@ class ServiceRouteApiFake extends ServiceRouteApi {
       : super(appContext, logger);
 
   @override
-  void initialize(AuthenticationModel model) {
-    super.initialize(model);
+  void initialize( ) {
+    super.initialize( );
     dio.interceptors.add(FakeDataInterceptor(dio));
   }
 }
@@ -28,6 +28,11 @@ class FakeDataInterceptor extends InterceptorsWrapper {
     if (options.path.contains('login')) {
       return dio.resolve<String>(FakeData.login());
     }
+
+    if (options.path.contains('service-route')) {
+      return dio.resolve<String>(FakeData.serviceRoutes());
+    }
+
     throw AppError(
         message: 'FakeData class not configured for this path:${options.path}');
   }

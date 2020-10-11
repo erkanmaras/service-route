@@ -8,7 +8,7 @@ class AuthenticationRepository extends IAuthenticationRepository {
 
   @override
   Future<AuthenticationToken> authenticate(AuthenticationModel model) async {
-      apiClient.initialize(model);
+      apiClient.initialize( );
       return apiClient.authenticate(model);
   }
 

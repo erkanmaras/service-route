@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:service_route/data/data.dart';
+import 'package:service_route/domain/domain.dart';
 import 'package:service_route/infrastructure/infrastructure.dart';
 import 'package:service_route/ui/ui.dart';
 
@@ -12,12 +14,16 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   _LoginPageState()
       : navigator = AppService.get<AppNavigator>(),
-        logger = AppService.get<Logger>();
+        logger = AppService.get<Logger>(),
+        authRepository = AppService.get<IAuthenticationRepository>(),
+        appContext = AppService.get<AppContext>();
 
   AppTheme appTheme;
+  MediaQueryData mediaQuery;
   AppNavigator navigator;
   Logger logger;
-
+  IAuthenticationRepository authRepository;
+  AppContext appContext;
   @override
   void initState() {
     super.initState();
@@ -30,6 +36,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void didChangeDependencies() {
+    mediaQuery = context.getMediaQuery();
     appTheme = context.getTheme();
     super.didChangeDependencies();
   }
@@ -41,40 +48,43 @@ class _LoginPageState extends State<LoginPage> {
           statusBarIconBrightness: Brightness.dark,
         ),
         child: Scaffold(
-          backgroundColor: appTheme.colors.canvasLight,
-          body: SafeArea(
-            child: ScrollConfiguration(
-              behavior: RemoveEffectScrollBehavior(),
-              child: CustomScrollView(
-                slivers: [
-                  SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Column(
-                      children: [
-                        _LoginHeader(),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Expanded(
+            backgroundColor: appTheme.colors.canvasLight,
+            body: BlocProvider<AuthenticationBloc>(
+                create: (context) =>
+                    AuthenticationBloc(authRepository: authRepository, appContext: appContext, logger: logger),
+                child: Builder(builder: (context) {
+                  return SafeArea(
+                      child: ScrollConfiguration(
+                    behavior: RemoveEffectScrollBehavior(),
+                    child: CustomScrollView(
+                      slivers: [
+                        SliverFillRemaining(
+                          hasScrollBody: false,
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              _LoginBody(),
+                            children: [
+                              _LoginHeader(),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    _LoginBody(),
+                                  ],
+                                ),
+                              ),
+                              Visibility(
+                                visible: !mediaQuery.keyboardVisible(),
+                                child: _LoginFooter(),
+                              )
                             ],
                           ),
-                        ),
-                        Visibility(
-                          visible: true,
-                          child: _LoginFooter(),
                         )
                       ],
                     ),
-                  )
-                ],
-              ),
-            ),
-          ),
-        ));
+                  ));
+                }))));
   }
 }
 
@@ -161,15 +171,14 @@ class _LoginHeader extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         'Servis Rota',
-                        style: Theme.of(context).textTheme.headline5.copyWith(
-                            color: Colors.black, fontWeight: FontWeight.bold),
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline5
+                            .copyWith(color: Colors.black, fontWeight: FontWeight.bold),
                       ),
                       Text(
                         '            by Öz Ata Tur',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText1
-                            .copyWith(color: Colors.black.withOpacity(0.5)),
+                        style: Theme.of(context).textTheme.bodyText1.copyWith(color: Colors.black.withOpacity(0.5)),
                       ),
                     ],
                   ),
@@ -202,13 +211,24 @@ class _LoginBody extends StatefulWidget {
 }
 
 class _LoginBodyState extends State<_LoginBody> {
+  _LoginBodyState()
+      : serviceRouteRepository = AppService.get<IServiceRouteRepository>(),
+        settingsRepository = AppService.get<ISettingsRepository>(),
+        appContext = AppService.get<AppContext>(),
+        navigator = AppService.get<AppNavigator>();
+
   final tecUserName = TextEditingController();
   final tecPassword = TextEditingController();
   final fnUserName = FocusNode();
   final fnPassword = FocusNode();
+  final userCredentialFormKey = GlobalKey<FormState>();
+  Localizer localizer;
   bool isPasswordVisible = false;
 
-  Localizer localizer;
+  IServiceRouteRepository serviceRouteRepository;
+  ISettingsRepository settingsRepository;
+  AppNavigator navigator;
+  AppContext appContext;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -217,59 +237,99 @@ class _LoginBodyState extends State<_LoginBody> {
   @override
   Widget build(BuildContext context) {
     var appTheme = context.getTheme();
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 30),
-      child: Column(
-        children: <Widget>[
-          Text('Kullanıcı Girişi', style: appTheme.textStyles.title),
-          SizedBox(height: 10),
-          Divider(),
-          SizedBox(height: 20),
-          _LoginFormInput(
-            hintText: 'Kullanıcı Adı',
-            prefixIcon: AppIcons.account,
-            focusNode: fnUserName,
-            inputFormatters: [LengthLimitingTextInputFormatter(15)],
-            onFieldSubmitted: (value) {
-              context.getFocusScope().requestFocus(fnPassword);
-            },
-            textInputAction: TextInputAction.next,
-            controller: tecUserName,
-          ),
-          _LoginFormInput(
-            focusNode: fnPassword,
-            hintText: 'Şifre',
-            prefixIcon: AppIcons.keyVariant,
-            controller: tecPassword,
-            textInputAction: TextInputAction.done,
-            inputFormatters: [LengthLimitingTextInputFormatter(30)],
-            obscureText: isPasswordVisible,
-            suffixIcon: isPasswordVisible ? AppIcons.eye : AppIcons.eyeOff,
-            onTabSuffixIcon: () {
-              setState(() {
-                isPasswordVisible = !isPasswordVisible;
-              });
-            },
-          ),
-          Divider(),
-          SizedBox(height: 10),
-          Container(
-            height: 40,
-            child: ProgressButton(
-                indicatorColor: appTheme.colors.canvasLight,
-                onPressed:
-                    (startProgressing, stopProgressing, isProgressing) async {
-                  startProgressing();
-                  await ErrorReporter.sendWating();
-                  await Future<void>.delayed(Duration(seconds: 2));
-                  stopProgressing();
-                  await AppService.get<AppNavigator>().pushHome(context);
-                },
-                child: Text('Giriş')),
-          ),
-        ],
+    return Form(
+      key: userCredentialFormKey,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30),
+        child: Column(
+          children: <Widget>[
+            Text('Kullanıcı Girişi', style: appTheme.textStyles.title),
+            SizedBox(height: 10),
+            Divider(),
+            SizedBox(height: 20),
+            _LoginFormInput(
+              hintText: 'Kullanıcı Adı',
+              prefixIcon: AppIcons.account,
+              focusNode: fnUserName,
+              inputFormatters: [LengthLimitingTextInputFormatter(15)],
+              onFieldSubmitted: (value) {
+                context.getFocusScope().requestFocus(fnPassword);
+              },
+              textInputAction: TextInputAction.next,
+              controller: tecUserName,
+            ),
+            _LoginFormInput(
+              focusNode: fnPassword,
+              hintText: 'Şifre',
+              prefixIcon: AppIcons.keyVariant,
+              controller: tecPassword,
+              textInputAction: TextInputAction.done,
+              inputFormatters: [LengthLimitingTextInputFormatter(30)],
+              obscureText: isPasswordVisible,
+              suffixIcon: isPasswordVisible ? AppIcons.eye : AppIcons.eyeOff,
+              onTabSuffixIcon: () {
+                setState(() {
+                  isPasswordVisible = !isPasswordVisible;
+                });
+              },
+            ),
+            Divider(),
+            SizedBox(height: 10),
+            BlocConsumer<AuthenticationBloc, AuthenticationState>(
+              listener: (context, state) async {
+                if (state is AuthenticationFail) {
+                  SnackBarAlert.error(context: context, message: localizer.translate(state.reason));
+                } else if (state is AuthenticationSuccess) {
+                  await onLoginSuccess();
+                }
+              },
+              builder: (context, state) {
+                return SizedBox(
+                  height: 40,
+                  width: double.infinity,
+                  child: ProgressButton(
+                    indicatorColor: Colors.white,
+                    onPressed: (startProcessing, stopProcessing, isProcessing) async {
+                      if (!userCredentialFormKey.currentState.validate()) {
+                        return;
+                      }
+
+                      if (state is! Authenticating) {
+                        try {
+                          startProcessing();
+
+                          var bloc = context.getBloc<AuthenticationBloc>();
+                          await bloc.authentication(AuthenticationModel(
+                            userName: tecUserName.text,
+                            password: tecPassword.text,
+                          ));
+                          var serviceRoutes = await serviceRouteRepository.serviceRoutes();
+                          await navigator.pushAndRemoveUntilHome(context, serviceRoutes);
+                        } finally {
+                          stopProcessing();
+                        }
+                      }
+                    },
+                    child: Text(
+                      'Giriş',
+                      style: appTheme.data.textTheme.headline6.copyWith(color: appTheme.colors.fontLight),
+                    ),
+                  ),
+                );
+              },
+            )
+          ],
+        ),
       ),
     );
+  }
+
+  Future<void> onLoginSuccess() async {
+    var userSettings = UserSettings(
+      userName: tecUserName.text,
+    );
+    await settingsRepository.saveUser(userSettings);
+    appContext.setAppSettings(user: userSettings);
   }
 }
 
@@ -319,22 +379,18 @@ class _LoginFormInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appTheme = context.getTheme();
-    var localizer = context.getLocalizer();
+    //var localizer = context.getLocalizer();
     var suffixIconWidget = suffixIcon != null
-        ? FieldButton(
-            onTab: onTabSuffixIcon,
-            iconData: suffixIcon,
-            iconEnabledColor: Colors.white54)
+        ? FieldButton(onTab: onTabSuffixIcon, iconData: suffixIcon, iconEnabledColor: Colors.white54)
         : null;
     return TextFormField(
       decoration: DenseInputDecoration(
           hintText: hintText,
           helperText: ' ',
-          prefixIcon: Icon(prefixIcon,
-              color: appTheme.colors.primary.lighten(0.2), size: 18),
+          prefixIcon: Icon(prefixIcon, color: appTheme.colors.primary.lighten(0.2), size: 18),
           suffixIcon: suffixIconWidget),
       focusNode: focusNode,
-      validator: RequiredValidator<String>(errorText: localizer.requiredValue),
+      validator: RequiredValidator<String>(errorText: 'Zorunlu'),
       inputFormatters: inputFormatters,
       textInputAction: TextInputAction.done,
       controller: controller,

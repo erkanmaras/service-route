@@ -19,15 +19,15 @@ class ServiceRouteApi {
   //   return appContext.user.authToken.token;
   // }
 
-  // Options get _requestOptions {
-  //   return Options(headers: <String, dynamic>{
-  //     'Authorization': 'Bearer $_authorizationToken'
-  //   });
-  // }
+  Options get _requestOptions {
+    return Options(headers: <String, dynamic>{
+      //'Authorization': 'Bearer $_authorizationToken'
+    });
+  }
 
-  void initialize(AuthenticationModel model) {
+  void initialize() {
     dio ??= Dio();
-    var baseUrl = model.serverName;
+    var baseUrl = '127.0.0.1';
     if (!baseUrl.startsWith('http')) {
       baseUrl = 'http://$baseUrl';
     }
@@ -58,13 +58,24 @@ class ServiceRouteApi {
   Future<AuthenticationToken> authenticate(AuthenticationModel model) async {
     try {
       final response = await dio.post<String>('login', data: model.toJson());
-      return AuthenticationToken.fromJson(
-          await jsonDecodeAsync(response.data) as Map<String, dynamic>);
+      return AuthenticationToken.fromJson(await jsonDecodeAsync(response.data) as Map<String, dynamic>);
     } catch (e) {
       throw ApiException.fromError(e);
     }
   }
 
+  Future<List<ServiceRoute>> serviceRoutes() async {
+    try {
+      final response = await dio.get<String>(
+        'service-routes',
+        options: _requestOptions,
+      );
+      final list = await jsonDecodeAsync(response.data) as List<dynamic>;
+      return list.map<ServiceRoute>((dynamic model) => ServiceRoute.fromJson(model as Map<String, dynamic>)).toList();
+    } catch (e) {
+      throw ApiException.fromError(e);
+    }
+  }
 
   static dynamic _jsonDecodeCallback(String data) => json.decode(data);
 
@@ -88,11 +99,9 @@ class AuthorizationTokenRefresh extends InterceptorsWrapper {
       dio.interceptors.responseLock.lock();
       dio.interceptors.errorLock.lock();
 
-      final response =
-          await Dio().post<dynamic>('/login', data: authModel.toJson());
+      final response = await Dio().post<dynamic>('/login', data: authModel.toJson());
       final authenticationToken =
-          AuthenticationToken.fromJson(response.data as Map<String, dynamic>)
-              as Map<dynamic, String>;
+          AuthenticationToken.fromJson(response.data as Map<String, dynamic>) as Map<dynamic, String>;
       options.headers['Authorization'] = 'Bearer $authenticationToken.token';
       //Update global token
       dio.interceptors.requestLock.unlock();
@@ -105,14 +114,12 @@ class AuthorizationTokenRefresh extends InterceptorsWrapper {
 }
 
 class ApiException extends AppException {
-  ApiException({String code, String message})
-      : super(code: code, message: message);
+  ApiException({String code, String message}) : super(code: code, message: message);
 
   factory ApiException.fromResponse(Response<dynamic> response) {
     var responseMessage = '';
     try {
-      var errorModel = ErrorModel.fromJson(
-          json.decode(response.data as String) as Map<String, dynamic>);
+      var errorModel = ErrorModel.fromJson(json.decode(response.data as String) as Map<String, dynamic>);
       switch (errorModel.type) {
         case 'error:sql':
           //bu case de error model de --detail-- alanı dolu.
@@ -127,8 +134,7 @@ class ApiException extends AppException {
           //bu case de error model de  --reasonDescription--  alanı dolu.
           //default value verilmedi, çünkü reasondescription translate edilmemiş
           //ise de kullanıcıya göstermek unExpectedErrorOccurred dan daha mantıklı
-          responseMessage =
-              _ApiStringToAppString.convert(errorModel.reasonDescription);
+          responseMessage = _ApiStringToAppString.convert(errorModel.reasonDescription);
           break;
         default:
           responseMessage = AppString.unExpectedErrorOccurred;
@@ -158,8 +164,7 @@ class ApiException extends AppException {
           break;
         case DioErrorType.DEFAULT:
           if (dioError.error is SocketException) {
-            return ApiException(
-                message: AppString.connectionCouldNotEstablishWithTheServer);
+            return ApiException(message: AppString.connectionCouldNotEstablishWithTheServer);
           } else {
             return AppError(innerException: dioError);
           }
@@ -178,8 +183,6 @@ class _ApiStringToAppString {
   };
 
   static String convert(String apiString, {String defaultValue}) {
-    return _map.containsKey(apiString)
-        ? _map[apiString]
-        : defaultValue ?? apiString;
+    return _map.containsKey(apiString) ? _map[apiString] : defaultValue ?? apiString;
   }
 }
