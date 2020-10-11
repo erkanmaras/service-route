@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locator/locator.dart';
 import 'package:service_route/data/data.dart';
+import 'package:service_route/domain/bloc/service_route/service_route_state.dart';
+import 'package:service_route/domain/domain.dart';
 import 'package:service_route/infrastructure/app_permission.dart';
 import 'package:service_route/ui/ui.dart';
 import 'package:service_route/infrastructure/infrastructure.dart';
+import 'package:wakelock/wakelock.dart';
 
 class ServiceRoutePage extends StatefulWidget {
   ServiceRoutePage({@required this.serviceRoute});
@@ -15,27 +18,19 @@ class ServiceRoutePage extends StatefulWidget {
 }
 
 class _ServiceRoutePageState extends State<ServiceRoutePage> {
+  _ServiceRoutePageState()
+      : logger = AppService.get<Logger>(),
+        appNavigator = AppService.get<AppNavigator>();
+
   GoogleMapController mapController;
-  final Set<Marker> markers = {};
-  int markerCounter = 0;
-  Location location;
-  double zoomLevel = 5;
-  bool tracking = false;
+  bool keepScreenOn = false;
   AppTheme appTheme;
+  AppNavigator appNavigator;
+  Logger logger;
+
   @override
   void initState() {
     super.initState();
-    Locator.getLocations((newLocation) {
-      // if (location.latitude == newLocation.latitude &&
-      //     location.longitude == newLocation.longitude) {
-      //   return;
-      // }
-      setState(() {
-        location = newLocation;
-        addLocationMarker(newLocation);
-        mapController.moveCamera(CameraUpdate.newLatLng(toLatLng(newLocation)));
-      });
-    });
   }
 
   @override
@@ -52,66 +47,104 @@ class _ServiceRoutePageState extends State<ServiceRoutePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: !tracking,
-        title: const Text('Servis Rota'),
-        actions: <Widget>[],
-      ),
-      body: Stack(children: [
-        GoogleMap(
-          initialCameraPosition: CameraPosition(
-            target: currentLocation(),
-            zoom: zoomLevel,
-          ),
-          zoomGesturesEnabled: true,
-          zoomControlsEnabled: false,
-          buildingsEnabled: false,
-          indoorViewEnabled: false,
-          myLocationEnabled: true,
-          myLocationButtonEnabled: true,
-          trafficEnabled: false,
-          markers: Set<Marker>.of(markers),
-          onMapCreated: onMapCreated,
-          onCameraMove: (position) {
-            zoomLevel = position.zoom;
-          },
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<ServiceRouteBloc>(
+          create: (BuildContext context) => ServiceRouteBloc(logger: logger),
         ),
-        buildActionButtons()
-      ]),
+      ],
+      child: BlocConsumer<ServiceRouteBloc, ServiceRouteState>(listener: (context, state) {
+        if (state is ServiceRouteMapFailState) {
+          SnackBarAlert.error(context: context, message: state.reason);
+          return;
+        }
+        mapController.moveCamera(CameraUpdate.newLatLngZoom(state.latLng, state.zoom));
+      }, builder: (context, state) {
+        var initialState = ServiceRouteState.initial();
+        return Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: !state.locating,
+            title: const Text(AppString.appName),
+            actions: <Widget>[
+              Row(
+                children: [
+                  Text(AppString.keepScreenOn),
+                  StatefulBuilder(
+                    builder: (context, setState) => Switch(
+                      value: keepScreenOn,
+                      onChanged: (value) {
+                        setState(() {
+                          keepScreenOn = value;
+                          Wakelock.toggle(enable: keepScreenOn);
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+          body: Stack(children: [
+            GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target: initialState.latLng,
+                zoom: initialState.zoom,
+              ),
+              buildingsEnabled: false,
+              myLocationEnabled: true,
+              myLocationButtonEnabled: true,
+              markers: state.markers,
+              onMapCreated: onMapCreated,
+            ),
+            buildActionButtons(context, state)
+          ]),
+        );
+      }),
     );
   }
 
-  Widget buildActionButtons() {
-    if (tracking) {
-      return buildTrackingAction();
+  Widget buildActionButtons(BuildContext context, ServiceRouteState state) {
+    if (state.locating) {
+      return buildTrackingAction(context);
     }
-    return buildStartAction();
+    return buildStartAction(context);
   }
 
-  Widget buildStartAction() {
+  Widget buildStartAction(
+    BuildContext context,
+  ) {
     return Align(
       alignment: Alignment.center,
-      child: buildButton(color: appTheme.colors.success, onPressed: onStart, text: 'Başla', large: true),
+      child: buildButton(
+        color: appTheme.colors.success,
+        onPressed: () => onStart(context),
+        text: AppString.start,
+        large: true,
+      ),
     );
   }
 
-  Widget buildTrackingAction() {
+  Widget buildTrackingAction(
+    BuildContext context,
+  ) {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 20),
-        child: ExpandedRow(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             buildButton(
               color: appTheme.colors.primary,
-              onPressed: onNewPassenger,
-              text: 'Yolcu Al',
+              onPressed: () => onNewPassenger(context),
+              text: AppString.takePassenger,
             ),
             buildButton(
               color: appTheme.colors.error,
-              onPressed: onStop,
-              text: 'Bitir',
+              onPressed: () async {
+                await onStop(context);
+              },
+              text: AppString.done,
             ),
           ],
         ),
@@ -123,78 +156,53 @@ class _ServiceRoutePageState extends State<ServiceRoutePage> {
     this.mapController = mapController;
   }
 
-  LatLng currentLocation() {
-    if (location == null) {
-      return LatLng(39.453553, 33.957929);
-    }
-    return LatLng(location.latitude, location.longitude);
-  }
-
-  Future<void> onStart() async {
+  Future<void> onStart(
+    BuildContext context,
+  ) async {
     var locationPermissionGranted = await AppPermission.locationPermissionGranted();
     if (!locationPermissionGranted) {
-      await MessageDialog.error(context: context, message: 'locationPermissionNotGranted');
+      await MessageDialog.error(context: context, message: AppString.locationPermissionNotGranted);
       return;
     }
 
     var locationServiceEnable = await AppPermission.locationServiceEnable();
     if (!locationServiceEnable) {
-      await MessageDialog.error(context: context, message: 'locationServiceNotEnable');
+      await MessageDialog.error(context: context, message: AppString.locationServiceNotEnable);
       return;
     }
 
+    Locator.getLocations((newLocation) {
+      context.bloc<ServiceRouteBloc>().addLocationMarker(newLocation);
+    });
+
     await Locator.start(
-      notificationTitle: 'Konum bilgisi alınıyor...',
-      notificationText: 'Son konum',
+      notificationTitle: AppString.locationInfoCollecting,
+      notificationText: AppString.lastLocation,
       updateIntervalInSecond: 10,
     );
-    setState(() {
-      tracking = true;
-    });
+
+    // Location newLocation = await Locator.getLastLocation();
+
+    context.bloc<ServiceRouteBloc>().startLocating();
   }
 
-  Future<void> onStop() async {
-    await Locator.stop();
-    markers.clear();
-    setState(() {
-      tracking = false;
-    });
-  }
-
-  Future<void> onNewPassenger() async {
-    Location newLocation = await Locator.getLastLocation();
-    setState(() {
-      location = newLocation;
-      addPassengerMarker(newLocation);
-    });
-  }
-
-  LatLng toLatLng(Location location) {
-    if (location == null) {
-      return null;
+  Future<void> onStop(
+    BuildContext context,
+  ) async {
+    var result = await MessageSheet.question(
+        context: context, message: AppString.areYouSureWantToCompleteServiceRoute, buttons: DialogButton.yesNo);
+    if (result == DialogResult.yes) {
+      await Locator.stop();
+      appNavigator.pop(context);
+      //context.bloc<ServiceRouteBloc>().stopLocating();
     }
-    return LatLng(location.latitude, location.longitude);
   }
 
-  void addPassengerMarker(Location location) {
-    addMarker(MarkerType.location, location, BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue));
-  }
-
-  void addLocationMarker(Location location) {
-    addMarker(MarkerType.location, location, BitmapDescriptor.defaultMarker);
-  }
-
-  void addMarker(MarkerType markerType, Location location, BitmapDescriptor icon) {
-    markerCounter += 1;
-    markers.add(Marker(
-      markerId: MarkerId(location.latitude.toString()),
-      position: LatLng(location.latitude, location.longitude),
-      infoWindow: InfoWindow(
-        title: 'Marker Info $markerCounter',
-        snippet: 'Marker Snipped',
-      ),
-      icon: icon,
-    ));
+  Future<void> onNewPassenger(
+    BuildContext context,
+  ) async {
+    Location newLocation = await Locator.getLastLocation();
+    context.bloc<ServiceRouteBloc>().addPassengerMarker(newLocation);
   }
 
   Widget buildButton(

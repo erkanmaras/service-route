@@ -45,7 +45,7 @@ class AuthenticationBloc extends Cubit<AuthenticationState> {
       emit(AuthenticationFail(reason: e.message));
       logger.error(e, stackTrace: s);
     } catch (e, s) {
-      emit(AuthenticationFail(reason: AppString.unExpectedErrorOccurred));
+      emit(AuthenticationFail(reason: AppString.anUnExpectedErrorOccurred));
       logger.error(e, stackTrace: s);
     }
   }

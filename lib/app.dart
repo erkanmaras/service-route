@@ -18,10 +18,7 @@ class App {
     );
 
     AppService.addSingleton<Logger>(
-      Logger(
-          name: 'AppLogger',
-          logLevel: LogLevel.error,
-          recordStackTraceAtLevel: LogLevel.error),
+      Logger(name: 'AppLogger', logLevel: LogLevel.error, recordStackTraceAtLevel: LogLevel.error),
     );
 
     AppService.addSingleton<AppNavigator>(
@@ -70,15 +67,14 @@ class App {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
     ));
-    SystemChrome.setPreferredOrientations(
-        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   }
 
   Future<void> showError(AppErrorReport appError) async {
     assert(AppNavigator.key.currentState != null, 'Navigator state null!');
     await MessageDialog.error(
       context: AppNavigator.key.currentState.overlay.context,
-      title: Localizer.instance?.error ?? AppString.error,
+      title: AppString.error,
       message: ErrorLocalizer.translate(appError),
     );
   }
@@ -89,12 +85,10 @@ class App {
 
   Future<void> initializeUserSettings() async {
     try {
-      var userSettings =
-          await AppService.get<ISettingsRepository>().getUser().timeout(
-                Duration(seconds: 3),
-                onTimeout: () =>
-                    throw AppError(message: 'Load user setting timeout!'),
-              );
+      var userSettings = await AppService.get<ISettingsRepository>().getUser().timeout(
+            Duration(seconds: 3),
+            onTimeout: () => throw AppError(message: 'Load user setting timeout!'),
+          );
       AppService.get<AppContext>().setAppSettings(user: userSettings);
     } catch (e, s) {
       AppService.get<Logger>().error(e, stackTrace: s);
@@ -133,8 +127,8 @@ class AppWidget extends StatelessWidget {
       builder: (context, child) {
         return addBetaBanner(MaterialApp(
           locale: Locale('tr'),
+          supportedLocales: [Locale('tr')],
           localizationsDelegates: _localizationsDelegates(),
-          supportedLocales: AppLocalizationsDelegate.supportedLocales,
           title: title,
           builder: _builder,
           navigatorKey: AppNavigator.key,
@@ -155,12 +149,7 @@ class AppWidget extends StatelessWidget {
   }
 
   Iterable<LocalizationsDelegate<dynamic>> _localizationsDelegates() {
-    return [
-      AppLocalizationsDelegate(),
-      AffLocalizationsDelegate(),
-      GlobalMaterialLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate
-    ];
+    return [AffLocalizationsDelegate(), GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate];
   }
 
   List<SingleChildWidget> _providers() {

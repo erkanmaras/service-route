@@ -22,7 +22,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final AppContext appContext;
 
   AppTheme appTheme;
-  Localizer localizer;
 
   @override
   void initState() {
@@ -32,7 +31,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void didChangeDependencies() {
     appTheme = context.getTheme();
-    localizer = context.getLocalizer();
     super.didChangeDependencies();
   }
 
@@ -40,7 +38,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(localizer.appName),
+          title: Text(AppString.appName),
         ),
         drawer: _MainDrawer(),
         body: ContentContainer(
@@ -52,9 +50,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
                   child: ListTile(
                     onTap: () => onTabRoute(widget.serviceRoutes[index]),
-                    leading: Icon(AppIcons.roadVariant),
+                    leading: Icon(
+                      AppIcons.mapMarker,
+                      color: appTheme.colors.primary,
+                    ),
                     title: Text(widget.serviceRoutes[index].description),
-                    subtitle: Text('A sufficiently long subtitle'),
+                    subtitle: Text('Lorem ipsum dolor sit amet'),
                     trailing: Icon(AppIcons.chevronRight),
                   ),
                 );
@@ -83,13 +84,10 @@ class _MainDrawer extends StatelessWidget {
   final AppNavigator navigator;
   final IAuthenticationRepository authRepository;
   final Logger logger;
-  final String applicationLegalese =
-      '''Copyright ©  2020 Öz Ata Tur.\n\nBu paket programların ve kullanım klavuzlarının ilgili telif hakları Fikir ve Sanat Eserlerinin işaretlenmesi hakkındaki yönetmelik hükümleri çercevesinde Öz Ata Tur firmasına aittir.''';
 
   @override
   Widget build(BuildContext context) {
     final AppTheme appTheme = context.getTheme();
-    final Localizer localizer = context.getLocalizer();
 
     return Drawer(
       child: Container(
@@ -121,7 +119,7 @@ class _MainDrawer extends StatelessWidget {
                               ),
                             )
                           ]))),
-              ...getDrawerItems(context, appTheme, localizer),
+              ...getDrawerItems(context, appTheme),
             ]),
           ),
           Container(
@@ -131,7 +129,7 @@ class _MainDrawer extends StatelessWidget {
                   Divider(),
                   ListTile(
                       leading: Icon(AppIcons.logout, color: appTheme.colors.error),
-                      title: Text('Çıkış', style: TextStyle(color: appTheme.colors.error)),
+                      title: Text(AppString.logout, style: TextStyle(color: appTheme.colors.error)),
                       onTap: () {
                         navigator.pushAndRemoveUntilLogin(context);
                       })
@@ -142,13 +140,12 @@ class _MainDrawer extends StatelessWidget {
     );
   }
 
-  List<Widget> getDrawerItems(BuildContext context, AppTheme appTheme, Localizer localizer) {
+  List<Widget> getDrawerItems(BuildContext context, AppTheme appTheme) {
     final List<Widget> drawerItems = <Widget>[];
 
-    drawerItems.add(IndentDivider());
     drawerItems.add(ListTile(
-      leading: Icon(AppIcons.informationOutline, color: appTheme.colors.fontPale),
-      title: Text('Hak Edişler', style: TextStyle(color: appTheme.colors.fontDark)),
+      leading: Icon(AppIcons.menuRight, color: appTheme.colors.primary),
+      title: Text(AppString.deserveds, style: TextStyle(color: appTheme.colors.fontDark)),
       onTap: () async {
         await navigator.pushDeserveds(context);
       },
@@ -157,8 +154,8 @@ class _MainDrawer extends StatelessWidget {
     drawerItems.add(IndentDivider());
 
     drawerItems.add(ListTile(
-      leading: Icon(AppIcons.informationOutline, color: appTheme.colors.fontPale),
-      title: Text('Dokümanlar', style: TextStyle(color: appTheme.colors.fontDark)),
+      leading: Icon(AppIcons.menuRight, color: appTheme.colors.primary),
+      title: Text(AppString.documents, style: TextStyle(color: appTheme.colors.fontDark)),
       onTap: () async {
         await navigator.pushDocuments(context);
       },
@@ -168,7 +165,7 @@ class _MainDrawer extends StatelessWidget {
 
     if (!kReleaseMode) {
       drawerItems.add(ListTile(
-        leading: Icon(AppIcons.eye, color: appTheme.colors.fontPale),
+        leading: Icon(AppIcons.menuRight, color: appTheme.colors.primary),
         title: Text('Theme Showcase', style: TextStyle(color: appTheme.colors.fontDark)),
         onTap: () {
           navigator.pop(context);
@@ -178,23 +175,6 @@ class _MainDrawer extends StatelessWidget {
 
       drawerItems.add(IndentDivider());
     }
-
-    drawerItems.add(ListTile(
-      leading: Icon(AppIcons.informationOutline, color: appTheme.colors.fontPale),
-      title: Text('Hakkında', style: TextStyle(color: appTheme.colors.fontDark)),
-      onTap: () async {
-        navigator.pop(context);
-        var version = await AppInfo.getAppInfo();
-
-        showAboutDialog(
-            context: context,
-            applicationName: localizer.appName,
-            applicationLegalese: applicationLegalese,
-            applicationVersion: version.getValue<String>('version'));
-      },
-    ));
-
-    drawerItems.add(IndentDivider());
 
     return drawerItems;
   }

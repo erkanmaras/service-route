@@ -222,7 +222,7 @@ class _LoginBodyState extends State<_LoginBody> {
   final fnUserName = FocusNode();
   final fnPassword = FocusNode();
   final userCredentialFormKey = GlobalKey<FormState>();
-  Localizer localizer;
+
   bool isPasswordVisible = false;
 
   IServiceRouteRepository serviceRouteRepository;
@@ -243,12 +243,12 @@ class _LoginBodyState extends State<_LoginBody> {
         padding: const EdgeInsets.symmetric(horizontal: 30),
         child: Column(
           children: <Widget>[
-            Text('Kullanıcı Girişi', style: appTheme.textStyles.title),
+            Text(AppString.loginForm, style: appTheme.textStyles.title),
             SizedBox(height: 10),
             Divider(),
             SizedBox(height: 20),
             _LoginFormInput(
-              hintText: 'Kullanıcı Adı',
+              hintText: AppString.userName,
               prefixIcon: AppIcons.account,
               focusNode: fnUserName,
               inputFormatters: [LengthLimitingTextInputFormatter(15)],
@@ -260,7 +260,7 @@ class _LoginBodyState extends State<_LoginBody> {
             ),
             _LoginFormInput(
               focusNode: fnPassword,
-              hintText: 'Şifre',
+              hintText: AppString.password,
               prefixIcon: AppIcons.keyVariant,
               controller: tecPassword,
               textInputAction: TextInputAction.done,
@@ -278,7 +278,7 @@ class _LoginBodyState extends State<_LoginBody> {
             BlocConsumer<AuthenticationBloc, AuthenticationState>(
               listener: (context, state) async {
                 if (state is AuthenticationFail) {
-                  SnackBarAlert.error(context: context, message: localizer.translate(state.reason));
+                  SnackBarAlert.error(context: context, message: state.reason);
                 } else if (state is AuthenticationSuccess) {
                   await onLoginSuccess();
                 }
@@ -298,7 +298,7 @@ class _LoginBodyState extends State<_LoginBody> {
                         try {
                           startProcessing();
 
-                          var bloc = context.getBloc<AuthenticationBloc>();
+                          var bloc = context.bloc<AuthenticationBloc>();
                           await bloc.authentication(AuthenticationModel(
                             userName: tecUserName.text,
                             password: tecPassword.text,
@@ -311,7 +311,7 @@ class _LoginBodyState extends State<_LoginBody> {
                       }
                     },
                     child: Text(
-                      'Giriş',
+                      AppString.login,
                       style: appTheme.data.textTheme.headline6.copyWith(color: appTheme.colors.fontLight),
                     ),
                   ),
@@ -390,7 +390,7 @@ class _LoginFormInput extends StatelessWidget {
           prefixIcon: Icon(prefixIcon, color: appTheme.colors.primary.lighten(0.2), size: 18),
           suffixIcon: suffixIconWidget),
       focusNode: focusNode,
-      validator: RequiredValidator<String>(errorText: 'Zorunlu'),
+      validator: RequiredValidator<String>(errorText: AppString.requiredField),
       inputFormatters: inputFormatters,
       textInputAction: TextInputAction.done,
       controller: controller,

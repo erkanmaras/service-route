@@ -127,7 +127,7 @@ class ApiException extends AppException {
           //başka bir mesaj düşünülebilir mi?
           responseMessage = _ApiStringToAppString.convert(
             errorModel.detail,
-            defaultValue: AppString.unExpectedErrorOccurred,
+            defaultValue: AppString.anUnExpectedErrorOccurred,
           );
           break;
         case 'login-failed':
@@ -137,10 +137,10 @@ class ApiException extends AppException {
           responseMessage = _ApiStringToAppString.convert(errorModel.reasonDescription);
           break;
         default:
-          responseMessage = AppString.unExpectedErrorOccurred;
+          responseMessage = AppString.anUnExpectedErrorOccurred;
       }
     } catch (e) {
-      responseMessage = AppString.unExpectedErrorOccurred;
+      responseMessage = AppString.anUnExpectedErrorOccurred;
     }
     return ApiException(message: responseMessage);
   }
@@ -172,13 +172,13 @@ class ApiException extends AppException {
       }
     }
 
-    return ApiException(message: AppString.unExpectedErrorOccurred);
+    return ApiException(message: AppString.anUnExpectedErrorOccurred);
   }
 }
 
 class _ApiStringToAppString {
   static Map<String, String> _map = {
-    'InvalidUsernameOrPassword': AppString.invalidUserNameOrPassword,
+    'InvalidUsernameOrPassword': AppString.invalidUsernameOrPassword,
     'Unknown': AppString.authenticationFailed,
   };
 
