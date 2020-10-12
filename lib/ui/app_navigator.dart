@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:service_route/data/data.dart';
 import 'package:service_route/ui/pages/deserved_rights_page.dart';
+import 'package:service_route/ui/pages/document_upload_page.dart';
 import 'package:service_route/ui/pages/documents_page.dart';
 import 'package:service_route/ui/pages/home_page.dart';
 import 'package:service_route/ui/pages/login_page.dart';
@@ -38,7 +39,14 @@ class AppNavigator {
     );
   }
 
-  Future<void> pushDeservedRights(BuildContext context) {
+  Future<void> pushDocumentUpload(BuildContext context,ServiceDocument serviceDocument) {
+    return Navigator.push(
+      context,
+      MaterialPageRoute<void>(builder: (context) => DocumentUploadPage(serviceDocument :serviceDocument)),
+    );
+  }
+
+    Future<void> pushDeservedRights(BuildContext context) {
     return Navigator.push(
       context,
       MaterialPageRoute<void>(builder: (context) => DeservedRightsPage()),

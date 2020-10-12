@@ -87,14 +87,11 @@ class _RoutePageState extends State<RoutePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(5),
-                    child: Text(
-                      widget.serviceRoute.description,
-                      style: appTheme.textStyles.subtitleBold.copyWith(color: appTheme.colors.primary),
-                    ),
-                  ),
+                CardTitle(
+                  title: widget.serviceRoute.description,
+                ),
+                SizedBox(
+                  height: 5,
                 ),
                 Expanded(
                   child: Stack(children: [

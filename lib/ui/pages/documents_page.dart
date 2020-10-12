@@ -12,11 +12,13 @@ class DocumentsPage extends StatefulWidget {
 class _DocumentsPageState extends State<DocumentsPage> {
   _DocumentsPageState()
       : logger = AppService.get<Logger>(),
-        iserviceRouteRepository = AppService.get<IServiceRouteRepository>();
+        iserviceRouteRepository = AppService.get<IServiceRouteRepository>(),
+        appNavigator = AppService.get<AppNavigator>();
 
   Logger logger;
   IServiceRouteRepository iserviceRouteRepository;
   AppTheme appTheme;
+  AppNavigator appNavigator;
   Future<List<ServiceDocument>> serviceDocuments;
 
   @override
@@ -50,7 +52,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                 } else if (!snapshot.hasData || snapshot.data.isNullOrEmpty()) {
                   return BackgroundHint.noData(context);
                 } else {
-                 return buildBody(snapshot.data);
+                  return buildBody(snapshot.data);
                 }
               }
             }),
@@ -82,5 +84,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
     );
   }
 
-  void onTabRoute(ServiceDocument selectedDocument) {}
+  void onTabRoute(ServiceDocument selectedDocument) {
+    appNavigator.pushDocumentUpload(context, selectedDocument);
+  }
 }

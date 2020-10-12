@@ -74,7 +74,6 @@ class _DeservedRightsPageState extends State<DeservedRightsPage> {
             ),
             title: Text(deservedRight.description),
             subtitle: Text('Lorem ipsum dolor sit amet'),
-            trailing: Icon(AppIcons.chevronRight),
           ),
         );
       },
