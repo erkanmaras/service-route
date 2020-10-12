@@ -27,9 +27,9 @@ class AppNavigator {
         MaterialPageRoute<void>(builder: (context) => HomePage(serviceRoutes: serviceRoutes)), (route) => false);
   }
 
-  Future<void> pushServiceRoute(BuildContext context, ServiceRoute serviceRoute) {
+  Future<bool> pushServiceRoute(BuildContext context, ServiceRoute serviceRoute) {
     return Navigator.of(context)
-        .push(MaterialPageRoute<void>(builder: (context) => RoutePage(serviceRoute: serviceRoute)));
+        .push(MaterialPageRoute<bool>(builder: (context) => RoutePage(serviceRoute: serviceRoute)));
   }
 
   Future<void> pushDocuments(BuildContext context) {

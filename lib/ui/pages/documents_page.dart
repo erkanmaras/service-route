@@ -67,7 +67,6 @@ class _DocumentsPageState extends State<DocumentsPage> {
         var document = serviceDocuments[index];
         return Card(
           elevation: 0,
-          margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
           child: ListTile(
             onTap: () => onTabRoute(document),
             leading: Icon(

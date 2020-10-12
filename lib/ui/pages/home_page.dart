@@ -61,12 +61,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 })));
   }
 
-  Future<void> onTabRoute(ServiceRoute selectedServiceRoute) async {
-    await openServiceRoutePage(selectedServiceRoute);
+  Future<void> onTabRoute(BuildContext context, ServiceRoute selectedServiceRoute) async {
+    var result = await openServiceRoutePage(selectedServiceRoute);
+    if (result != null && result == true) {
+      SnackBarAlert.info(context: context, message: AppString.serviceRouteFileUploaded);
+    }
   }
 
-  Future<void> openServiceRoutePage(ServiceRoute selectedServiceRoute) async {
-    await navigator.pushServiceRoute(context, selectedServiceRoute);
+  Future<bool> openServiceRoutePage(ServiceRoute selectedServiceRoute) async {
+    return navigator.pushServiceRoute(context, selectedServiceRoute);
   }
 
   Widget buildBody(List<ServiceRoute> serviceRoutes) {
@@ -76,9 +79,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         var route = serviceRoutes[index];
         return Card(
           elevation: 0,
-          margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
           child: ListTile(
-            onTap: () => onTabRoute(route),
+            onTap: () => onTabRoute(context, route),
             leading: Icon(
               AppIcons.fileDocument,
               color: appTheme.colors.primary,

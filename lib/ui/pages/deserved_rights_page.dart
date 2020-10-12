@@ -65,9 +65,7 @@ class _DeservedRightsPageState extends State<DeservedRightsPage> {
         var deservedRight = serviceDeservedRight[index];
         return Card(
           elevation: 0,
-          margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
           child: ListTile(
-            onTap: () => onTabRoute(deservedRight),
             leading: Icon(
               AppIcons.fileDocument,
               color: appTheme.colors.primary,
@@ -80,6 +78,4 @@ class _DeservedRightsPageState extends State<DeservedRightsPage> {
       itemCount: serviceDeservedRight.length,
     );
   }
-
-  void onTabRoute(DeservedRight selectedDocument) {}
 }

@@ -19,6 +19,7 @@ class RoutePage extends StatefulWidget {
 class _RoutePageState extends State<RoutePage> {
   _RoutePageState()
       : logger = AppService.get<Logger>(),
+        repository = AppService.get<IServiceRouteRepository>(),
         appNavigator = AppService.get<AppNavigator>();
 
   GoogleMapController mapController;
@@ -26,6 +27,7 @@ class _RoutePageState extends State<RoutePage> {
   AppTheme appTheme;
   AppNavigator appNavigator;
   Logger logger;
+  IServiceRouteRepository repository;
 
   @override
   void initState() {
@@ -49,7 +51,7 @@ class _RoutePageState extends State<RoutePage> {
     return MultiBlocProvider(
       providers: [
         BlocProvider<RouteBloc>(
-          create: (BuildContext context) => RouteBloc(logger: logger),
+          create: (BuildContext context) => RouteBloc(repository: repository, logger: logger),
         ),
       ],
       child: BlocConsumer<RouteBloc, RouteState>(listener: (context, state) {
@@ -83,33 +85,35 @@ class _RoutePageState extends State<RoutePage> {
               )
             ],
           ),
-          body: ContentContainer(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                CardTitle(
-                  title: widget.serviceRoute.description,
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Expanded(
-                  child: Stack(children: [
-                    GoogleMap(
-                      initialCameraPosition: CameraPosition(
-                        target: initialState.latLng,
-                        zoom: initialState.zoom,
+          body: Builder(
+            builder: (context) => ContentContainer(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  CardTitle(
+                    title: widget.serviceRoute.description,
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Expanded(
+                    child: Stack(children: [
+                      GoogleMap(
+                        initialCameraPosition: CameraPosition(
+                          target: initialState.latLng,
+                          zoom: initialState.zoom,
+                        ),
+                        buildingsEnabled: false,
+                        myLocationEnabled: true,
+                        myLocationButtonEnabled: true,
+                        markers: state.markers,
+                        onMapCreated: onMapCreated,
                       ),
-                      buildingsEnabled: false,
-                      myLocationEnabled: true,
-                      myLocationButtonEnabled: true,
-                      markers: state.markers,
-                      onMapCreated: onMapCreated,
-                    ),
-                    buildActionButtons(context, state)
-                  ]),
-                ),
-              ],
+                      buildActionButtons(context, state)
+                    ]),
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -186,7 +190,7 @@ class _RoutePageState extends State<RoutePage> {
     }
 
     Locator.getLocations((newLocation) {
-      context.bloc<RouteBloc>().addLocationMarker(newLocation);
+      context.getBloc<RouteBloc>().addRouteLocation(newLocation);
     });
 
     await Locator.start(
@@ -197,18 +201,29 @@ class _RoutePageState extends State<RoutePage> {
 
     // Location newLocation = await Locator.getLastLocation();
 
-    context.bloc<RouteBloc>().startLocating();
+    await context.getBloc<RouteBloc>().startLocating();
   }
 
   Future<void> onStop(
     BuildContext context,
   ) async {
     var result = await MessageSheet.question(
-        context: context, message: AppString.areYouSureWantToCompleteServiceRoute, buttons: DialogButton.yesNo);
+      context: context,
+      message: AppString.areYouSureWantToCompleteServiceRoute,
+      buttons: DialogButton.yesNo,
+    );
     if (result == DialogResult.yes) {
       await Locator.stop();
-      appNavigator.pop(context);
-      //context.bloc<ServiceRouteBloc>().stopLocating();
+      var bloc = context.getBloc<RouteBloc>();
+
+      if (await bloc.fileExist()) {
+        await WaitDialog.scope(
+          waitMessage: AppString.serviceRouteFileUploading,
+          context: context,
+          call: (_) async => bloc.uploadFile(),
+        );
+        appNavigator.pop(context, result: true);
+      }
     }
   }
 
@@ -216,11 +231,15 @@ class _RoutePageState extends State<RoutePage> {
     BuildContext context,
   ) async {
     Location newLocation = await Locator.getLastLocation();
-    context.bloc<RouteBloc>().addPassengerMarker(newLocation);
+    await context.getBloc<RouteBloc>().addPassengerLocation(newLocation);
   }
 
-  Widget buildButton(
-      {@required VoidCallback onPressed, @required String text, @required Color color, bool large = false}) {
+  Widget buildButton({
+    @required VoidCallback onPressed,
+    @required String text,
+    @required Color color,
+    bool large = false,
+  }) {
     var sizeMultiplier = large ? 3.0 : 2.0;
     return ElevatedButton(
         style: ElevatedButton.styleFrom(

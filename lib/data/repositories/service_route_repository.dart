@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:service_route/data/data.dart';
 import 'package:service_route/domain/domain.dart';
 
@@ -6,7 +8,6 @@ class ServiceRouteRepository extends IServiceRouteRepository {
   ServiceRouteApi apiClient;
   @override
   Future<List<ServiceRoute>> getServiceRoutes() {
-    apiClient.initialize();
     return apiClient.getServiceRoutes();
   }
 
@@ -18,5 +19,10 @@ class ServiceRouteRepository extends IServiceRouteRepository {
   @override
   Future<List<ServiceDocument>> getServiceDocuments() {
     return apiClient.getServiceDocuments();
+  }
+
+  @override
+  Future<void> uploadServiceRouteFile(File file) {
+    return apiClient.uploadServiceRouteFile(file);
   }
 }

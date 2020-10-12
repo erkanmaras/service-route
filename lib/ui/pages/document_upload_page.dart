@@ -23,9 +23,16 @@ class _DocumentUploadPage extends State<DocumentUploadPage> {
     super.didChangeDependencies();
   }
 
+  final List<String> files = <String>[
+    'mcmcdmdc20122122.jpg',
+    'dfsdfsdf.jpg',
+    '45334f34ferfef23.jpg',
+    '45334f34ferfef23.png',
+    '45334f34ferfef23.png',
+    '45334f34ferfef2345334f.png'
+  ];
   @override
   Widget build(BuildContext context) {
-    var files = ['Dosya 1', 'Dosya2', 'Dosya 1', 'Dosya2', 'Dosya 1', 'Dosya2'];
     return Scaffold(
       appBar: AppBar(
         title: const Text(AppString.documentUpload),
@@ -39,67 +46,27 @@ class _DocumentUploadPage extends State<DocumentUploadPage> {
             AppIcons.upload,
           )),
       body: ContentContainer(
-        child: CustomScrollView(
-          slivers: [
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: Column(
-                children: [
-                  CardTitle(
-                    title: widget.serviceDocument.description,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Row(
-                      children: [
-                        Icon(AppIcons.chevronRight),
-                        Expanded(
-                            child: Text(
-                          'Yüklenecek belgenin fotoğrafını çekebilir veya resim galerisinden seçim yapabilirsiniz.',
-                          style: appTheme.textStyles.overline.copyWith(color: appTheme.colors.fontPale),
-                        )),
-                      ],
+        child: ScrollConfiguration(
+          behavior: RemoveEffectScrollBehavior(),
+          child: CustomScrollView(
+            slivers: [
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Column(
+                  children: [
+                    CardTitle(
+                      title: widget.serviceDocument.description,
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Row(
-                      children: [
-                        Icon(AppIcons.chevronRight),
-                        Expanded(
-                            child: Text(
-                          'Seçilen doküman yüklendikten sonra, başka bir doküman seçerek birden fazla belge yükleyebilirsiniz.',
-                          style: appTheme.textStyles.overline.copyWith(color: appTheme.colors.fontPale),
-                        )),
-                      ],
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 2),
+                      child: UploadImage(),
                     ),
-                  ),
-                  UploadImage(),
-                  Align(
-                      alignment: Alignment.topLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.all(5),
-                        child: Text(
-                          'Yüklenenler:',
-                          style: appTheme.textStyles.bodyBold.copyWith(color: appTheme.colors.fontPale),
-                        ),
-                      )),
-                      IndentDivider(),
-                  for (var item in files)
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.all(5),
-                        child: Text(
-                          item,
-                          style: appTheme.textStyles.body.copyWith(color: appTheme.colors.fontPale),
-                        ),
-                      ),
-                    ),
-                ],
+                    _UploadedFiles(files)
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -143,7 +110,8 @@ class _UploadImageState extends State<UploadImage> {
       children: [
         Container(
           margin: EdgeInsets.symmetric(horizontal: 2),
-          decoration: BoxDecoration(border: Border.all(color: appTheme.colors.canvasDark)),
+          decoration:
+              BoxDecoration(color: appTheme.colors.canvas, border: Border.all(color: appTheme.colors.canvasDark)),
           height: 200,
           width: double.infinity,
           child: image,
@@ -185,5 +153,61 @@ class _UploadImageState extends State<UploadImage> {
       logger.error(e, stackTrace: s);
       await MessageDialog.error(context: context, message: ErrorMessage.get(e));
     }
+  }
+}
+
+class _UploadedFiles extends StatelessWidget {
+  _UploadedFiles(this.fileNames);
+
+  final List<String> fileNames;
+
+  @override
+  Widget build(BuildContext context) {
+    var appTheme = context.getTheme();
+    return Column(
+      children: [
+        Container(
+            alignment: Alignment.topLeft,
+            child: Padding(
+              padding: const EdgeInsets.all(5),
+              child: Text(
+                'Yüklenen',
+                style: appTheme.textStyles.bodyBold,
+              ),
+            )),
+        IndentDivider(),
+        ...buildUploadedFiles(appTheme)
+      ],
+    );
+  }
+
+  List<Widget> buildUploadedFiles(AppTheme appTheme) {
+    var widgets = <Widget>[];
+    for (var item in fileNames) {
+      widgets.add(Column(
+        children: [
+          // if (widgets.isNotEmpty) IndentDivider(),
+          Row(
+            children: [
+              Icon(
+                AppIcons.circleSmall,
+                color: appTheme.colors.fontPale,
+              ),
+              Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Text(
+                    item,
+                    style: appTheme.textStyles.body,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ));
+    }
+    return widgets;
   }
 }

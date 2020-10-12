@@ -90,18 +90,29 @@ class ServiceRouteApi {
     }
   }
 
-    Future<List<ServiceDocument>> getServiceDocuments() async {
+  Future<List<ServiceDocument>> getServiceDocuments() async {
     try {
       final response = await dio.get<String>(
         'service-document',
         options: _requestOptions,
       );
       final list = await jsonDecodeAsync(response.data) as List<dynamic>;
-      return list.map<ServiceDocument>((dynamic model) => ServiceDocument.fromJson(model as Map<String, dynamic>)).toList();
+      return list
+          .map<ServiceDocument>((dynamic model) => ServiceDocument.fromJson(model as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       throw ApiException.fromError(e);
     }
   }
+
+  Future<void> uploadServiceRouteFile(File file) async {
+    String fileName = file.path.split('/').last;
+    FormData formData = FormData.fromMap(<String, MultipartFile>{
+      'file': await MultipartFile.fromFile(file.path, filename: fileName),
+    });
+    await dio.post<dynamic>('upload-route', data: formData);
+  }
+
   static dynamic _jsonDecodeCallback(String data) => json.decode(data);
 
   static Future<dynamic> jsonDecodeAsync(String data) {

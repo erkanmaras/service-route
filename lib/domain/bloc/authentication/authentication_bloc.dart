@@ -5,11 +5,9 @@ import 'package:service_route/domain/bloc/authentication/authentication_state.da
 import 'package:service_route/domain/domain.dart';
 import 'package:service_route/infrastructure/infrastructure.dart';
 export 'package:service_route/domain/bloc/authentication/authentication_state.dart';
+
 class AuthenticationBloc extends Cubit<AuthenticationState> {
-  AuthenticationBloc(
-      {@required this.authRepository,
-      @required this.appContext,
-      @required this.logger})
+  AuthenticationBloc({@required this.authRepository, @required this.appContext, @required this.logger})
       : assert(authRepository != null),
         assert(logger != null),
         super(AuthenticationInitial());
@@ -18,12 +16,13 @@ class AuthenticationBloc extends Cubit<AuthenticationState> {
   final Logger logger;
   final AppContext appContext;
 
-  Future<void> authentication(AuthenticationModel authModel,
-      {Future<void> Function() onSuccess}) async {
+  Future<void> authentication(
+    AuthenticationModel authModel, {
+    Future<void> Function() onSuccess,
+  }) async {
     try {
       if (authModel.hasEmptyField()) {
-        emit(AuthenticationFail(
-            reason: AppString.authenticationParameterMissing));
+        emit(AuthenticationFail(reason: AppString.authenticationParameterMissing));
       } else {
         emit(Authenticating());
 

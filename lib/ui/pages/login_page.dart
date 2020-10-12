@@ -298,7 +298,7 @@ class _LoginBodyState extends State<_LoginBody> {
                         try {
                           startProcessing();
 
-                          var bloc = context.bloc<AuthenticationBloc>();
+                          var bloc = context.getBloc<AuthenticationBloc>();
                           await bloc.authentication(AuthenticationModel(
                             userName: tecUserName.text,
                             password: tecPassword.text,
