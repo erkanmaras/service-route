@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(AppString.appName),
+          title: Text(AppString.serviceRouteList),
         ),
         drawer: _MainDrawer(),
         body: ContentContainer(

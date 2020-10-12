@@ -29,5 +29,6 @@ class AppString {
   static const String lastLocation = 'Son Konum';
   static const String locationServiceNotEnable = 'Konum servisi aktif değil!';
   static const String locationPermissionNotGranted = 'Konum erişim izini verilmemiş!';
-    static const String serviceRouteList = 'Sefer Listesi';
+  static const String serviceRouteList = 'Sefer Listesi';
+  static const String serviceRoute = 'Sefer';
 }
