@@ -64,7 +64,7 @@ class _ServiceRoutePageState extends State<ServiceRoutePage> {
         return Scaffold(
           appBar: AppBar(
             automaticallyImplyLeading: !state.locating,
-            title: const Text(AppString.appName),
+            title: const Text(AppString.serviceRouteList),
             actions: <Widget>[
               Row(
                 children: [

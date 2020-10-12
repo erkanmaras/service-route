@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:service_route/infrastructure/infrastructure.dart';
 
 class DocumentsPage extends StatefulWidget {
   @override
@@ -10,7 +11,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Servis Rota'),
+        title: const Text(AppString.documents),
         actions: <Widget>[],
       ),
       body: const Center(
