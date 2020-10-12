@@ -4,24 +4,24 @@ import 'package:service_route/domain/domain.dart';
 import 'package:service_route/infrastructure/infrastructure.dart';
 import 'package:service_route/ui/ui.dart';
 
-class DocumentsPage extends StatefulWidget {
+class DeservedRightsPage extends StatefulWidget {
   @override
-  _DocumentsPageState createState() => _DocumentsPageState();
+  _DeservedRightsPageState createState() => _DeservedRightsPageState();
 }
 
-class _DocumentsPageState extends State<DocumentsPage> {
-  _DocumentsPageState()
+class _DeservedRightsPageState extends State<DeservedRightsPage> {
+  _DeservedRightsPageState()
       : logger = AppService.get<Logger>(),
         iserviceRouteRepository = AppService.get<IServiceRouteRepository>();
 
   Logger logger;
   IServiceRouteRepository iserviceRouteRepository;
   AppTheme appTheme;
-  Future<List<ServiceDocument>> serviceDocuments;
+  Future<List<DeservedRight>> deservedRights;
 
   @override
   void initState() {
-    serviceDocuments = iserviceRouteRepository.getServiceDocuments();
+    deservedRights = iserviceRouteRepository.getDeservedRights();
     super.initState();
   }
 
@@ -35,12 +35,12 @@ class _DocumentsPageState extends State<DocumentsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppString.documents),
+        title: const Text(AppString.deservedRights),
         actions: <Widget>[],
       ),
       body: ContentContainer(
-        child: FutureBuilder<List<ServiceDocument>>(
-            future: serviceDocuments,
+        child: FutureBuilder<List<DeservedRight>>(
+            future: deservedRights,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return BackgroundHint.loading(context, AppString.loading);
@@ -50,7 +50,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                 } else if (!snapshot.hasData || snapshot.data.isNullOrEmpty()) {
                   return BackgroundHint.noData(context);
                 } else {
-                 return buildBody(snapshot.data);
+                  return buildBody(snapshot.data);
                 }
               }
             }),
@@ -58,29 +58,29 @@ class _DocumentsPageState extends State<DocumentsPage> {
     );
   }
 
-  Widget buildBody(List<ServiceDocument> serviceDocuments) {
+  Widget buildBody(List<DeservedRight> serviceDeservedRight) {
     return ListView.separated(
       separatorBuilder: (context, index) => IndentDivider(),
       itemBuilder: (context, index) {
-        var document = serviceDocuments[index];
+        var deservedRight = serviceDeservedRight[index];
         return Card(
           elevation: 0,
           margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
           child: ListTile(
-            onTap: () => onTabRoute(document),
+            onTap: () => onTabRoute(deservedRight),
             leading: Icon(
               AppIcons.fileDocument,
               color: appTheme.colors.primary,
             ),
-            title: Text(document.description),
+            title: Text(deservedRight.description),
             subtitle: Text('Lorem ipsum dolor sit amet'),
             trailing: Icon(AppIcons.chevronRight),
           ),
         );
       },
-      itemCount: serviceDocuments.length,
+      itemCount: serviceDeservedRight.length,
     );
   }
 
-  void onTabRoute(ServiceDocument selectedDocument) {}
+  void onTabRoute(DeservedRight selectedDocument) {}
 }

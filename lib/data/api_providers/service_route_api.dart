@@ -64,7 +64,7 @@ class ServiceRouteApi {
     }
   }
 
-  Future<List<ServiceRoute>> serviceRoutes() async {
+  Future<List<ServiceRoute>> getServiceRoutes() async {
     try {
       final response = await dio.get<String>(
         'service-routes',
@@ -77,6 +77,31 @@ class ServiceRouteApi {
     }
   }
 
+  Future<List<DeservedRight>> getDeservedRights() async {
+    try {
+      final response = await dio.get<String>(
+        'deserved-right',
+        options: _requestOptions,
+      );
+      final list = await jsonDecodeAsync(response.data) as List<dynamic>;
+      return list.map<DeservedRight>((dynamic model) => DeservedRight.fromJson(model as Map<String, dynamic>)).toList();
+    } catch (e) {
+      throw ApiException.fromError(e);
+    }
+  }
+
+    Future<List<ServiceDocument>> getServiceDocuments() async {
+    try {
+      final response = await dio.get<String>(
+        'service-document',
+        options: _requestOptions,
+      );
+      final list = await jsonDecodeAsync(response.data) as List<dynamic>;
+      return list.map<ServiceDocument>((dynamic model) => ServiceDocument.fromJson(model as Map<String, dynamic>)).toList();
+    } catch (e) {
+      throw ApiException.fromError(e);
+    }
+  }
   static dynamic _jsonDecodeCallback(String data) => json.decode(data);
 
   static Future<dynamic> jsonDecodeAsync(String data) {

@@ -2,23 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locator/locator.dart';
 import 'package:service_route/data/data.dart';
-import 'package:service_route/domain/bloc/service_route/service_route_state.dart';
 import 'package:service_route/domain/domain.dart';
 import 'package:service_route/infrastructure/app_permission.dart';
 import 'package:service_route/ui/ui.dart';
 import 'package:service_route/infrastructure/infrastructure.dart';
 import 'package:wakelock/wakelock.dart';
 
-class ServiceRoutePage extends StatefulWidget {
-  ServiceRoutePage({@required this.serviceRoute});
+class RoutePage extends StatefulWidget {
+  RoutePage({@required this.serviceRoute});
 
   final ServiceRoute serviceRoute;
   @override
-  _ServiceRoutePageState createState() => _ServiceRoutePageState();
+  _RoutePageState createState() => _RoutePageState();
 }
 
-class _ServiceRoutePageState extends State<ServiceRoutePage> {
-  _ServiceRoutePageState()
+class _RoutePageState extends State<RoutePage> {
+  _RoutePageState()
       : logger = AppService.get<Logger>(),
         appNavigator = AppService.get<AppNavigator>();
 
@@ -49,18 +48,18 @@ class _ServiceRoutePageState extends State<ServiceRoutePage> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<ServiceRouteBloc>(
-          create: (BuildContext context) => ServiceRouteBloc(logger: logger),
+        BlocProvider<RouteBloc>(
+          create: (BuildContext context) => RouteBloc(logger: logger),
         ),
       ],
-      child: BlocConsumer<ServiceRouteBloc, ServiceRouteState>(listener: (context, state) {
-        if (state is ServiceRouteMapFailState) {
+      child: BlocConsumer<RouteBloc, RouteState>(listener: (context, state) {
+        if (state is RouteFailState) {
           SnackBarAlert.error(context: context, message: state.reason);
           return;
         }
         mapController.moveCamera(CameraUpdate.newLatLngZoom(state.latLng, state.zoom));
       }, builder: (context, state) {
-        var initialState = ServiceRouteState.initial();
+        var initialState = RouteState.initial();
         return Scaffold(
           appBar: AppBar(
             automaticallyImplyLeading: !state.locating,
@@ -84,26 +83,44 @@ class _ServiceRoutePageState extends State<ServiceRoutePage> {
               )
             ],
           ),
-          body: Stack(children: [
-            GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: initialState.latLng,
-                zoom: initialState.zoom,
-              ),
-              buildingsEnabled: false,
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
-              markers: state.markers,
-              onMapCreated: onMapCreated,
+          body: ContentContainer(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: Text(
+                      widget.serviceRoute.description,
+                      style: appTheme.textStyles.subtitleBold.copyWith(color: appTheme.colors.primary),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Stack(children: [
+                    GoogleMap(
+                      initialCameraPosition: CameraPosition(
+                        target: initialState.latLng,
+                        zoom: initialState.zoom,
+                      ),
+                      buildingsEnabled: false,
+                      myLocationEnabled: true,
+                      myLocationButtonEnabled: true,
+                      markers: state.markers,
+                      onMapCreated: onMapCreated,
+                    ),
+                    buildActionButtons(context, state)
+                  ]),
+                ),
+              ],
             ),
-            buildActionButtons(context, state)
-          ]),
+          ),
         );
       }),
     );
   }
 
-  Widget buildActionButtons(BuildContext context, ServiceRouteState state) {
+  Widget buildActionButtons(BuildContext context, RouteState state) {
     if (state.locating) {
       return buildTrackingAction(context);
     }
@@ -172,7 +189,7 @@ class _ServiceRoutePageState extends State<ServiceRoutePage> {
     }
 
     Locator.getLocations((newLocation) {
-      context.bloc<ServiceRouteBloc>().addLocationMarker(newLocation);
+      context.bloc<RouteBloc>().addLocationMarker(newLocation);
     });
 
     await Locator.start(
@@ -183,7 +200,7 @@ class _ServiceRoutePageState extends State<ServiceRoutePage> {
 
     // Location newLocation = await Locator.getLastLocation();
 
-    context.bloc<ServiceRouteBloc>().startLocating();
+    context.bloc<RouteBloc>().startLocating();
   }
 
   Future<void> onStop(
@@ -202,7 +219,7 @@ class _ServiceRoutePageState extends State<ServiceRoutePage> {
     BuildContext context,
   ) async {
     Location newLocation = await Locator.getLastLocation();
-    context.bloc<ServiceRouteBloc>().addPassengerMarker(newLocation);
+    context.bloc<RouteBloc>().addPassengerMarker(newLocation);
   }
 
   Widget buildButton(

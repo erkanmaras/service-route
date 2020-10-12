@@ -28,4 +28,48 @@ class FakeData {
   } 
 ]''';
   }
+
+  static String deservedRights() {
+    return '''[
+  {
+    "description": "Hak Ediş 1"
+  },
+
+  {
+    "description": "Hak Ediş 2"
+  },
+
+   {
+    "description": "Hak Ediş 3"
+  },
+
+   {
+    "description": "Hak Ediş 4"
+  },
+
+   {
+    "description": "Hak Ediş 5"
+  } 
+]''';
+  }
+
+  static String serviceDocuments() {
+    return '''[
+  {
+    "description": "Ehliyet"
+  },
+
+   {
+    "description": "Ruhsat"
+  },
+
+   {
+    "description": "Trafik Sigortası"
+  },
+
+   {
+    "description": "Kasko"
+  } 
+]''';
+  }
 }

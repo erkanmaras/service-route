@@ -16,15 +16,17 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   _HomePageState()
       : navigator = AppService.get<AppNavigator>(),
-        appContext = AppService.get<AppContext>();
+        appContext = AppService.get<AppContext>(),
+        iserviceRouteRepository = AppService.get<IServiceRouteRepository>();
 
   final AppNavigator navigator;
   final AppContext appContext;
-
+  IServiceRouteRepository iserviceRouteRepository;
   AppTheme appTheme;
-
+  Future<List<ServiceRoute>> serviceRoutes;
   @override
   void initState() {
+    serviceRoutes = iserviceRouteRepository.getServiceRoutes();
     super.initState();
   }
 
@@ -42,26 +44,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
         drawer: _MainDrawer(),
         body: ContentContainer(
-          child: ListView.separated(
-              separatorBuilder: (context, index) => IndentDivider(),
-              itemBuilder: (context, index) {
-                return Card(
-                  elevation: 0,
-                  margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                  child: ListTile(
-                    onTap: () => onTabRoute(widget.serviceRoutes[index]),
-                    leading: Icon(
-                      AppIcons.mapMarker,
-                      color: appTheme.colors.primary,
-                    ),
-                    title: Text(widget.serviceRoutes[index].description),
-                    subtitle: Text('Lorem ipsum dolor sit amet'),
-                    trailing: Icon(AppIcons.chevronRight),
-                  ),
-                );
-              },
-              itemCount: widget.serviceRoutes.length),
-        ));
+            child: FutureBuilder<List<ServiceRoute>>(
+                future: serviceRoutes,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return BackgroundHint.loading(context, AppString.loading);
+                  } else {
+                    if (snapshot.hasError) {
+                      return BackgroundHint.unExpectedError(context);
+                    } else if (!snapshot.hasData || snapshot.data.isNullOrEmpty()) {
+                      return BackgroundHint.noData(context);
+                    } else {
+                      return buildBody(snapshot.data);
+                    }
+                  }
+                })));
   }
 
   Future<void> onTabRoute(ServiceRoute selectedServiceRoute) async {
@@ -70,6 +67,30 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Future<void> openServiceRoutePage(ServiceRoute selectedServiceRoute) async {
     await navigator.pushServiceRoute(context, selectedServiceRoute);
+  }
+
+  Widget buildBody(List<ServiceRoute> serviceRoutes) {
+    return ListView.separated(
+      separatorBuilder: (context, index) => IndentDivider(),
+      itemBuilder: (context, index) {
+        var route = serviceRoutes[index];
+        return Card(
+          elevation: 0,
+          margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+          child: ListTile(
+            onTap: () => onTabRoute(route),
+            leading: Icon(
+              AppIcons.fileDocument,
+              color: appTheme.colors.primary,
+            ),
+            title: Text(route.description),
+            subtitle: Text('Lorem ipsum dolor sit amet'),
+            trailing: Icon(AppIcons.chevronRight),
+          ),
+        );
+      },
+      itemCount: serviceRoutes.length,
+    );
   }
 }
 
@@ -145,9 +166,9 @@ class _MainDrawer extends StatelessWidget {
 
     drawerItems.add(ListTile(
       leading: Icon(AppIcons.menuRight, color: appTheme.colors.primary),
-      title: Text(AppString.deserveds, style: TextStyle(color: appTheme.colors.fontDark)),
+      title: Text(AppString.deservedRights, style: TextStyle(color: appTheme.colors.fontDark)),
       onTap: () async {
-        await navigator.pushDeserveds(context);
+        await navigator.pushDeservedRights(context);
       },
     ));
 

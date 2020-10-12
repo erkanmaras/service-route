@@ -5,8 +5,18 @@ class ServiceRouteRepository extends IServiceRouteRepository {
   ServiceRouteRepository(this.apiClient);
   ServiceRouteApi apiClient;
   @override
-  Future<List<ServiceRoute>> serviceRoutes() {
+  Future<List<ServiceRoute>> getServiceRoutes() {
     apiClient.initialize();
-    return apiClient.serviceRoutes();
+    return apiClient.getServiceRoutes();
+  }
+
+  @override
+  Future<List<DeservedRight>> getDeservedRights() {
+    return apiClient.getDeservedRights();
+  }
+
+  @override
+  Future<List<ServiceDocument>> getServiceDocuments() {
+    return apiClient.getServiceDocuments();
   }
 }

@@ -303,7 +303,7 @@ class _LoginBodyState extends State<_LoginBody> {
                             userName: tecUserName.text,
                             password: tecPassword.text,
                           ));
-                          var serviceRoutes = await serviceRouteRepository.serviceRoutes();
+                          var serviceRoutes = await serviceRouteRepository.getServiceRoutes();
                           await navigator.pushAndRemoveUntilHome(context, serviceRoutes);
                         } finally {
                           stopProcessing();

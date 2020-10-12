@@ -5,6 +5,9 @@ export 'models/authentication_model.dart';
 export 'models/code_description.dart';
 export 'models/error_model.dart';
 export 'models/service_route.dart';
+export 'models/service_document.dart';
+export 'models/deserved_right.dart';
+
 
 export 'api_providers/service_route_api.dart';
 export 'db_providers/service_route_db.dart';

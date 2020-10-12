@@ -75,7 +75,7 @@ class App {
     await MessageDialog.error(
       context: AppNavigator.key.currentState.overlay.context,
       title: AppString.error,
-      message: ErrorLocalizer.translate(appError),
+      message: ErrorMessage.get(appError),
     );
   }
 

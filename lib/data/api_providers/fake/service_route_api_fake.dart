@@ -6,12 +6,11 @@ import 'package:service_route/data/data.dart';
 import 'package:service_route/infrastructure/infrastructure.dart';
 
 class ServiceRouteApiFake extends ServiceRouteApi {
-  ServiceRouteApiFake(AppContext appContext, Logger logger)
-      : super(appContext, logger);
+  ServiceRouteApiFake(AppContext appContext, Logger logger) : super(appContext, logger);
 
   @override
-  void initialize( ) {
-    super.initialize( );
+  void initialize() {
+    super.initialize();
     dio.interceptors.add(FakeDataInterceptor(dio));
   }
 }
@@ -33,7 +32,14 @@ class FakeDataInterceptor extends InterceptorsWrapper {
       return dio.resolve<String>(FakeData.serviceRoutes());
     }
 
-    throw AppError(
-        message: 'FakeData class not configured for this path:${options.path}');
+    if (options.path.contains('deserved-right')) {
+      return dio.resolve<String>(FakeData.deservedRights());
+    }
+
+    if (options.path.contains('service-document')) {
+      return dio.resolve<String>(FakeData.serviceDocuments());
+    }
+
+    throw AppError(message: 'FakeData class not configured for this path:${options.path}');
   }
 }

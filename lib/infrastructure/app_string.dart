@@ -24,11 +24,13 @@ class AppString {
   static const String login = 'Giriş';
   static const String requiredField = 'Zorunlu';
   static const String documents = 'Dokümanlar';
-  static const String deserveds = 'Hak Edişler';
+    static const String documentUpload = 'Doküman Yükle';
+  static const String deservedRights = 'Hak Edişler';
   static const String locationInfoCollecting = 'Konum bilgisi alınıyor...';
   static const String lastLocation = 'Son Konum';
   static const String locationServiceNotEnable = 'Konum servisi aktif değil!';
   static const String locationPermissionNotGranted = 'Konum erişim izini verilmemiş!';
   static const String serviceRouteList = 'Sefer Listesi';
   static const String serviceRoute = 'Sefer';
+    static const String loading = 'Yükleniyor';
 }

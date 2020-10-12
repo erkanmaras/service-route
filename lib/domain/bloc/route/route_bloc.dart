@@ -2,14 +2,14 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locator/locator.dart';
 import 'package:meta/meta.dart';
 import 'package:bloc/bloc.dart';
-import 'package:service_route/domain/bloc/service_route/service_route_state.dart';
+import 'package:service_route/domain/bloc/route/route_state.dart';
 import 'package:service_route/infrastructure/infrastructure.dart';
-export 'package:service_route/domain/bloc/service_route/service_route_state.dart';
+export 'package:service_route/domain/bloc/route/route_state.dart';
 
-class ServiceRouteBloc extends Cubit<ServiceRouteState> {
-  ServiceRouteBloc({@required this.logger})
+class RouteBloc extends Cubit<RouteState> {
+  RouteBloc({@required this.logger})
       : assert(logger != null),
-        super(ServiceRouteState.initial());
+        super(RouteState.initial());
 
   final Logger logger;
 
@@ -31,10 +31,10 @@ class ServiceRouteBloc extends Cubit<ServiceRouteState> {
       ));
       emit(state.copyWith(locating: true, location: location, markers: markers, zoom: 16));
     } on AppException catch (e, s) {
-      emit(ServiceRouteMapFailState(reason: e.message, state: state));
+      emit(RouteFailState(reason: e.message, state: state));
       logger.error(e, stackTrace: s);
     } catch (e, s) {
-      emit(ServiceRouteMapFailState(reason: AppString.anUnExpectedErrorOccurred, state: state));
+      emit(RouteFailState(reason: AppString.anUnExpectedErrorOccurred, state: state));
       logger.error(e, stackTrace: s);
     }
   }
@@ -43,16 +43,16 @@ class ServiceRouteBloc extends Cubit<ServiceRouteState> {
     try {
       emit(state.copyWith(locating: true));
     } on AppException catch (e, s) {
-      emit(ServiceRouteMapFailState(reason: e.message, state: state));
+      emit(RouteFailState(reason: e.message, state: state));
       logger.error(e, stackTrace: s);
     } catch (e, s) {
-      emit(ServiceRouteMapFailState(reason: AppString.anUnExpectedErrorOccurred, state: state));
+      emit(RouteFailState(reason: AppString.anUnExpectedErrorOccurred, state: state));
       logger.error(e, stackTrace: s);
     }
   }
 
   void stopLocating() {
-    emit(ServiceRouteState.initial());
+    emit(RouteState.initial());
   }
 }
 
