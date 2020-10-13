@@ -1,34 +1,42 @@
 {
   "project_info": {
-    "project_number": "504520051578",
-    "firebase_url": "https://service-route-38299.firebaseio.com",
-    "project_id": "service-route-38299",
-    "storage_bucket": "service-route-38299.appspot.com"
+    "project_number": "563442519999",
+    "firebase_url": "https://servis-rotasi-com.firebaseio.com",
+    "project_id": "servis-rotasi-com",
+    "storage_bucket": "servis-rotasi-com.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:504520051578:android:68a8cfa3ec789f666824c3",
+        "mobilesdk_app_id": "1:563442519999:android:6f9a7340d0a12cf6ea1b0a",
         "android_client_info": {
           "package_name": "com.servisrotasi.com.service_route"
         }
       },
       "oauth_client": [
         {
-          "client_id": "504520051578-1f3ot0650k6408m4vjfsmt338b2u3l57.apps.googleusercontent.com",
+          "client_id": "563442519999-v0crs0rbemrjn8m0tb0gchkjodqp1emf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.servisrotasi.com.service_route",
+            "certificate_hash": "7428f0936fb5b01f44bf9397318c81ff5ff12c6d"
+          }
+        },
+        {
+          "client_id": "563442519999-l2vee2o41e4n6m57j9dl150t5j8gr74s.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDR-8Gpb23MLyULbWuqr8Hr-a2iTri6ObY"
+          "current_key": "AIzaSyA0kg9PMXnVyCALmQu7layUcYUQnyBYWq4"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "504520051578-1f3ot0650k6408m4vjfsmt338b2u3l57.apps.googleusercontent.com",
+              "client_id": "563442519999-l2vee2o41e4n6m57j9dl150t5j8gr74s.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
