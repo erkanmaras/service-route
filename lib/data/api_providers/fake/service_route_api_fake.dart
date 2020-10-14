@@ -43,6 +43,10 @@ class FakeDataInterceptor extends InterceptorsWrapper {
     if (options.path.contains('upload-route')) {
       return dio.resolve<bool>(true);
     }
+
+        if (options.path.contains('upload-file')) {
+      return dio.resolve<bool>(true);
+    }
     throw AppError(message: 'FakeData class not configured for this path:${options.path}');
   }
 }

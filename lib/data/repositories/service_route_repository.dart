@@ -25,4 +25,9 @@ class ServiceRouteRepository extends IServiceRouteRepository {
   Future<void> uploadServiceRouteFile(File file) {
     return apiClient.uploadServiceRouteFile(file);
   }
+
+    @override
+  Future<void> uploadServiceDocumentFile(File file) {
+    return apiClient.uploadServiceRouteFile(file);
+  }
 }

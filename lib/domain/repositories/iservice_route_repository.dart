@@ -7,4 +7,5 @@ abstract class IServiceRouteRepository {
   Future<List<ServiceDocument>> getServiceDocuments();
   Future<List<DeservedRight>> getDeservedRights();
   Future<void> uploadServiceRouteFile(File file);
+  Future<void> uploadServiceDocumentFile(File file);
 }

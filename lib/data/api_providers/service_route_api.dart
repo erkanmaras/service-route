@@ -113,6 +113,14 @@ class ServiceRouteApi {
     await dio.post<dynamic>('upload-route', data: formData);
   }
 
+  Future<void> uploadServiceDocumentFile(File file) async {
+    String fileName = file.path.split('/').last;
+    FormData formData = FormData.fromMap(<String, MultipartFile>{
+      'file': await MultipartFile.fromFile(file.path, filename: fileName),
+    });
+    await dio.post<dynamic>('upload-file', data: formData);
+  }
+
   static dynamic _jsonDecodeCallback(String data) => json.decode(data);
 
   static Future<dynamic> jsonDecodeAsync(String data) {
