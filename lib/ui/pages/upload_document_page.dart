@@ -69,7 +69,7 @@ class _UploadDocumentPage extends State<UploadDocumentPage> {
                         onPressed: () async {
                           if (state.hasFile) {
                             await WaitDialog.scope(
-                              waitMessage: AppString.serviceRouteFileUploading,
+                              waitMessage: 'Doküman gönderiliyor...',
                               context: context,
                               call: (_) async => context.getBloc<UploadDocumentBloc>().uploadSelectedDocument(),
                             );
