@@ -70,7 +70,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
           child: ListTile(
             onTap: () => onTabRoute(document),
             leading: Icon(
-              AppIcons.fileDocument,
+              AppIcons.fileDocumentOutline,
               color: appTheme.colors.primary,
             ),
             title: Text(document.description),

@@ -7,12 +7,12 @@ import 'package:service_route/infrastructure/infrastructure.dart';
 export 'package:service_route/domain/bloc/authentication/authentication_state.dart';
 
 class AuthenticationBloc extends Cubit<AuthenticationState> {
-  AuthenticationBloc({@required this.authRepository, @required this.appContext, @required this.logger})
-      : assert(authRepository != null),
+  AuthenticationBloc({@required this.repository, @required this.appContext, @required this.logger})
+      : assert(repository != null),
         assert(logger != null),
         super(AuthenticationInitial());
 
-  final IAuthenticationRepository authRepository;
+  final IServiceRouteRepository repository;
   final Logger logger;
   final AppContext appContext;
 
@@ -26,7 +26,7 @@ class AuthenticationBloc extends Cubit<AuthenticationState> {
       } else {
         emit(Authenticating());
 
-        var authToken = await authRepository.authenticate(authModel);
+        var authToken = await repository.authenticate(authModel);
         appContext.setAppUser(
           authToken,
           authModel.userName,

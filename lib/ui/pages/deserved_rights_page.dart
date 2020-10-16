@@ -67,7 +67,7 @@ class _DeservedRightsPageState extends State<DeservedRightsPage> {
           elevation: 0,
           child: ListTile(
             leading: Icon(
-              AppIcons.fileDocument,
+              AppIcons.fileDocumentOutline,
               color: appTheme.colors.primary,
             ),
             title: Text(deservedRight.description),

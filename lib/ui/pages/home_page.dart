@@ -82,7 +82,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           child: ListTile(
             onTap: () => onTabRoute(context, route),
             leading: Icon(
-              AppIcons.fileDocument,
+              AppIcons.mapMarkerOutline,
               color: appTheme.colors.primary,
             ),
             title: Text(route.description),
@@ -99,13 +99,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 class _MainDrawer extends StatelessWidget {
   _MainDrawer()
       : navigator = AppService.get<AppNavigator>(),
-        authRepository = AppService.get<IAuthenticationRepository>(),
+        repository = AppService.get<IServiceRouteRepository>(),
         logger = AppService.get<Logger>(),
         appContext = AppService.get<AppContext>();
 
   final AppContext appContext;
   final AppNavigator navigator;
-  final IAuthenticationRepository authRepository;
+  final IServiceRouteRepository repository;
   final Logger logger;
 
   @override

@@ -39,10 +39,6 @@ class App {
 
     /////Repositories
 
-    AppService.addTransient<IAuthenticationRepository>(
-      () => AuthenticationRepository(AppService.get<ServiceRouteApi>()),
-    );
-
     AppService.addTransient<ISettingsRepository>(
       () => SettingsRespository(AppService.get<ServiceRouteDb>()),
     );

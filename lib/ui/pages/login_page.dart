@@ -15,14 +15,14 @@ class _LoginPageState extends State<LoginPage> {
   _LoginPageState()
       : navigator = AppService.get<AppNavigator>(),
         logger = AppService.get<Logger>(),
-        authRepository = AppService.get<IAuthenticationRepository>(),
+        repository = AppService.get<IServiceRouteRepository>(),
         appContext = AppService.get<AppContext>();
 
   AppTheme appTheme;
   MediaQueryData mediaQuery;
   AppNavigator navigator;
   Logger logger;
-  IAuthenticationRepository authRepository;
+  IServiceRouteRepository repository;
   AppContext appContext;
   @override
   void initState() {
@@ -51,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
             backgroundColor: appTheme.colors.canvasLight,
             body: BlocProvider<AuthenticationBloc>(
                 create: (context) =>
-                    AuthenticationBloc(authRepository: authRepository, appContext: appContext, logger: logger),
+                    AuthenticationBloc(repository: repository, appContext: appContext, logger: logger),
                 child: Builder(builder: (context) {
                   return SafeArea(
                       child: ScrollConfiguration(

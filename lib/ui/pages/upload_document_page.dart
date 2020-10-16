@@ -109,16 +109,34 @@ class _UploadDocumentPage extends State<UploadDocumentPage> {
                                 ),
                                 ExpandedRow(
                                   children: [
-                                    TextButton(
-                                        onPressed: () async {
-                                          await pickImageFromGallery(context);
-                                        },
-                                        child: Text('Galeriden Seç')),
-                                    TextButton(
-                                        onPressed: () async {
-                                          await pickImageFromCamera(context);
-                                        },
-                                        child: Text('Fofograf Çek'))
+                                    //ElevatedButton(
+                                    //     // style: ElevatedButton.styleFrom(
+                                    //     //     backgroundColor: appTheme.colors.primary.withOpacity(0.1),
+                                    //     //     ),
+                                    //     onPressed: () {},
+                                    //     child: Text('Galeriden Seç')),
+                                    // OutlinedButton(
+                                    //     style: OutlinedButton.styleFrom(
+                                    //       backgroundColor: appTheme.colors.primary.withOpacity(0.1),
+                                    //     ),
+                                    //     onPressed: () {},
+                                    //     child: Text('Galeriden Seç')),
+                                    Padding(
+                                      padding: const EdgeInsets.all(10),
+                                      child: ElevatedButton(
+                                          onPressed: () async {
+                                            await pickImageFromGallery(context);
+                                          },
+                                          child: Text('Galeriden Seç')),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(10),
+                                      child: ElevatedButton(
+                                          onPressed: () async {
+                                            await pickImageFromCamera(context);
+                                          },
+                                          child: Text('Fofograf Çek')),
+                                    )
                                   ],
                                 ),
                               ],
@@ -171,9 +189,13 @@ class _UploadedFiles extends StatelessWidget {
           alignment: Alignment.topLeft,
           child: Padding(
             padding: const EdgeInsets.all(5),
-            child: Text(
-              'Geçmiş',
-              style: appTheme.textStyles.bodyBold,
+            child: Row(
+              children: [
+                Text(
+                  'Geçmiş',
+                  style: appTheme.textStyles.bodyBold,
+                ),
+              ],
             ),
           ),
         ),
@@ -194,7 +216,6 @@ class _UploadedFiles extends StatelessWidget {
       }
       widgets.add(Column(
         children: [
-          // if (widgets.isNotEmpty) IndentDivider(),
           Padding(
             padding: const EdgeInsets.all(5),
             child: Row(

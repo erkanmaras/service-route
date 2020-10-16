@@ -19,6 +19,8 @@ class RouteBloc extends Cubit<RouteState> {
 
   final Logger logger;
   final IServiceRouteRepository repository;
+
+  int maxLocationErrorCount = 3;
   Future<void> addPassengerLocation(Location location) async {
     return _addMarker(
       LocationType.passenger,
@@ -49,12 +51,13 @@ class RouteBloc extends Cubit<RouteState> {
       ));
       await _writeToFile(locationType, location);
       emit(state.copyWith(locating: true, location: location, markers: markers, zoom: 16));
-    } on AppException catch (e, s) {
-      emit(RouteFailState(reason: e.message, state: state));
-      logger.error(e, stackTrace: s);
     } catch (e, s) {
+      maxLocationErrorCount -= 1;
       emit(RouteFailState(reason: AppString.anUnExpectedErrorOccurred, state: state));
-      logger.error(e, stackTrace: s);
+      //throttle error , keep sentry quota
+      if (maxLocationErrorCount > 0) {
+        logger.error(e, stackTrace: s);
+      }
     }
   }
 

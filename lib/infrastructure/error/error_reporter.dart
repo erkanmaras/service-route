@@ -1,70 +1,41 @@
-import 'dart:convert';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:aff/infrastructure.dart';
 import 'package:service_route/infrastructure/infrastructure.dart';
+import 'package:sentry/sentry.dart';
 
 class ErrorReporter {
+  static SentryClient sentry;
   static Future<void> initialize() async {
-    await Firebase.initializeApp();
-    await FirebaseCrashlytics.instance
-        .setCrashlyticsCollectionEnabled(kReleaseMode);
+    sentry = SentryClient(dsn: 'https://fe29bb3df9654b2e9c877da0f189fd63@o461639.ingest.sentry.io/5463672');
+    var appContext = AppService.tryGet<AppContext>();
+    var userIdentifier = appContext == null || appContext.user == null ? 'unknown' : '${appContext.user.userName}';
+    sentry.userContext = User(id: userIdentifier);
   }
 
   static Future<void> sendErrorLog(LogRecord log) async {
     try {
-      await _setGlobals('ErrorLog');
-      await FirebaseCrashlytics.instance.recordError(
-        log.message,
-        log.stackTrace,
+      await sentry.captureException(
+        exception: log.message,
+        stackTrace: log.stackTrace,
       );
     } catch (e) {
       if (!kReleaseMode) {
-        debugPrint(e?.toString() ?? 'Crashlytics sendErrorLog failed!');
+        debugPrint(e?.toString() ?? 'ErrorReporter sendErrorLog failed!');
       }
     }
   }
 
   static Future<void> sendErrorReport(AppErrorReport errorReport) async {
     try {
-      await _setGlobals('ErrorReport');
-      await FirebaseCrashlytics.instance.recordError(
-        errorReport.error,
-        errorReport.stackTrace,
-        information: [errorReport.context],
-        printDetails: false,
+      await sentry.captureException(
+        exception: errorReport.error,
+        stackTrace: errorReport.stackTrace,
       );
     } catch (e) {
       if (!kReleaseMode) {
-        debugPrint(e?.toString() ?? 'Crashlytics sendErrorReport failed!');
+        debugPrint(e?.toString() ?? 'ErrorReporter sendErrorReport failed!');
       }
     }
   }
-
-  static Future<void> _setGlobals(String reportType) async {
-    var appContext = AppService.tryGet<AppContext>();
-    // ignore: unused_local_variable
-    var userIdentifier = appContext == null || appContext.user == null
-        ? 'unknown'
-        : '${appContext.user.userName}';
-    FirebaseCrashlytics instance = FirebaseCrashlytics.instance;
-    await instance.setUserIdentifier(userIdentifier);
-    await instance.setCustomKey('report_type', reportType);
-    await instance.setCustomKey(
-        'device_info', jsonEncode(await AppInfo.getDeviceInfo()));
-    await instance.setCustomKey(
-        'app_info', jsonEncode(await AppInfo.getAppInfo()));
-  }
-
-  //Warning!
-  //Exist only for test
-  //This method terminates the app
-  static Future<void> crash() async {
-    FirebaseCrashlytics.instance.crash();
-  }
-
-   static Future<void> sendWating() async {
-    await FirebaseCrashlytics.instance.sendUnsentReports();
-  }
+ 
 }
