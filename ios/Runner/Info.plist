@@ -55,6 +55,14 @@
     <!-- additionally for iOS 9/10, if you need always permission -->
     <key>NSLocationAlwaysUsageDescription</key>
     <string>The location information collected will be used to measure the distance traveled.</string>
+  
+    <!-- image picker-->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>The Photo library will be used to save the document photo.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>The microphone will be used to recod audio.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>The camera will be used to take the document photo.</string>
 	 <!-- Modified -->
 </dict>
 </plist>
