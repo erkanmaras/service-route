@@ -73,6 +73,7 @@ class _RoutePageState extends State<RoutePage> {
                   Text(AppString.keepScreenOn),
                   StatefulBuilder(
                     builder: (context, setState) => Switch(
+                      inactiveTrackColor: appTheme.colors.canvasDark,
                       value: keepScreenOn,
                       onChanged: (value) {
                         setState(() {
@@ -104,6 +105,7 @@ class _RoutePageState extends State<RoutePage> {
                           target: initialState.latLng,
                           zoom: initialState.zoom,
                         ),
+                        mapToolbarEnabled: false,
                         buildingsEnabled: false,
                         myLocationEnabled: true,
                         myLocationButtonEnabled: true,
@@ -232,6 +234,8 @@ class _RoutePageState extends State<RoutePage> {
     BuildContext context,
   ) async {
     Location newLocation = await Locator.getLastLocation();
+
+    await TextInputDialog.show(context, 'Yolcu Adı');
     await context.getBloc<RouteBloc>().addPassengerLocation(newLocation);
   }
 

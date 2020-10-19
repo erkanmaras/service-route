@@ -71,7 +71,7 @@ class _DeservedRightsPageState extends State<DeservedRightsPage> {
               color: appTheme.colors.primary,
             ),
             title: Text(deservedRight.description),
-            subtitle: Text('Lorem ipsum dolor sit amet'),
+            subtitle: Text('Lorem ipsum dolor sit amet',style:appTheme.textStyles.subtitle.copyWith(color:appTheme.colors.fontPale)),
           ),
         );
       },

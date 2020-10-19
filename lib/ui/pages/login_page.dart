@@ -50,8 +50,7 @@ class _LoginPageState extends State<LoginPage> {
         child: Scaffold(
             backgroundColor: appTheme.colors.canvasLight,
             body: BlocProvider<AuthenticationBloc>(
-                create: (context) =>
-                    AuthenticationBloc(repository: repository, appContext: appContext, logger: logger),
+                create: (context) => AuthenticationBloc(repository: repository, appContext: appContext, logger: logger),
                 child: Builder(builder: (context) {
                   return SafeArea(
                       child: ScrollConfiguration(
@@ -136,7 +135,7 @@ class _LoginHeader extends StatelessWidget {
               y2bezier: 54,
             ),
             child: Container(
-              color: Color(0xFFF4F5F7),
+              color: appTheme.colors.canvas,
             ),
           ),
           ClipPath(
@@ -171,14 +170,11 @@ class _LoginHeader extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         'Servis Rota',
-                        style: Theme.of(context)
-                            .textTheme
-                            .headline5
-                            .copyWith(color: Colors.black, fontWeight: FontWeight.bold),
+                        style: Theme.of(context).textTheme.headline5.copyWith(fontWeight: FontWeight.bold),
                       ),
                       Text(
                         '            by Öz Ata Tur',
-                        style: Theme.of(context).textTheme.bodyText1.copyWith(color: Colors.black.withOpacity(0.5)),
+                        style: Theme.of(context).textTheme.bodyText1.copyWith(color: appTheme.colors.fontPale),
                       ),
                     ],
                   ),
@@ -338,7 +334,7 @@ class _LoginFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         height: 80,
-        color: Color(0xFFF4F5F7),
+        color: context.getTheme().colors.canvas,
         child: ClipPath(
           clipper: _HeaderClipper(
             yLine: 60,
@@ -379,15 +375,15 @@ class _LoginFormInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appTheme = context.getTheme();
-    //var localizer = context.getLocalizer();
     var suffixIconWidget = suffixIcon != null
-        ? FieldButton(onTab: onTabSuffixIcon, iconData: suffixIcon, iconEnabledColor: Colors.white54)
+        ? FieldButton(
+            onTab: onTabSuffixIcon, iconData: suffixIcon, iconEnabledColor: appTheme.colors.fontPale.lighten(0.3))
         : null;
     return TextFormField(
       decoration: DenseInputDecoration(
           hintText: hintText,
           helperText: ' ',
-          prefixIcon: Icon(prefixIcon, color: appTheme.colors.primary.lighten(0.2), size: 18),
+          prefixIcon: Icon(prefixIcon, color: appTheme.colors.primary.lighten(0.3), size: 18),
           suffixIcon: suffixIconWidget),
       focusNode: focusNode,
       validator: RequiredValidator<String>(errorText: AppString.requiredField),

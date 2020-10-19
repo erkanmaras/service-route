@@ -138,7 +138,7 @@ class AppWidget extends StatelessWidget {
   Widget _builder(BuildContext context, Widget child) {
     var theme = context.getTheme(listen: true);
     if (!theme.initialized) {
-      theme.setTheme(buildWhiteTheme(context));
+      theme.setTheme(buildDefaultTheme(context, colors: _AppColors()));
     }
 
     return Theme(data: theme.data, child: child);
@@ -166,4 +166,23 @@ class AppWidget extends StatelessWidget {
       child: child,
     );
   }
+}
+
+class _AppColors extends DefaultThemeColors {
+  @override
+  Color get accent => Color(0xff15254E);
+  @override
+  Color get primary => Color(0xff0083FF);
+  @override
+  Color get canvasDark => Color(0xffe7edf7);
+  @override
+  Color get canvas => Color(0xffF6F8FC);
+  @override
+  Color get canvasLight => Color(0xffffffff);
+  @override
+  Color get divider => Color(0xffd9e1f2);
+  @override
+  Color get font => Color(0xff15254E);
+  @override
+  Color get fontPale => Color(0xff8291b8);
 }

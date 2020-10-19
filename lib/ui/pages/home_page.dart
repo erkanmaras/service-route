@@ -86,8 +86,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               color: appTheme.colors.primary,
             ),
             title: Text(route.description),
-            subtitle: Text('Lorem ipsum dolor sit amet'),
-            trailing: Icon(AppIcons.chevronRight),
+            subtitle: Text('Lorem ipsum dolor sit amet',
+                style: appTheme.textStyles.subtitle.copyWith(color: appTheme.colors.fontPale)),
+            trailing: Icon(
+              AppIcons.chevronRight,
+              color: appTheme.colors.primary,
+            ),
           ),
         );
       },
@@ -130,7 +134,7 @@ class _MainDrawer extends StatelessWidget {
                           children: <Widget>[
                             Icon(
                               AppIcons.accountCircle,
-                              color: appTheme.colors.canvasLight.withOpacity(0.5),
+                              color: appTheme.colors.canvasLight.withOpacity(0.8),
                               size: kMinInteractiveDimension,
                             ),
                             Padding(
@@ -138,7 +142,7 @@ class _MainDrawer extends StatelessWidget {
                               child: Text(
                                 '${appContext.user.userName}',
                                 style: appTheme.textStyles.title
-                                    .copyWith(color: appTheme.colors.canvasLight.withOpacity(0.5)),
+                                    .copyWith(color: appTheme.colors.canvasLight.withOpacity(0.8)),
                               ),
                             )
                           ]))),
@@ -152,7 +156,8 @@ class _MainDrawer extends StatelessWidget {
                   Divider(),
                   ListTile(
                       leading: Icon(AppIcons.logout, color: appTheme.colors.error),
-                      title: Text(AppString.logout, style: TextStyle(color: appTheme.colors.error)),
+                      title: Text(AppString.logout,
+                          style: appTheme.textStyles.subtitleBold.copyWith(color: appTheme.colors.error)),
                       onTap: () {
                         navigator.pushAndRemoveUntilLogin(context);
                       })
@@ -168,7 +173,7 @@ class _MainDrawer extends StatelessWidget {
 
     drawerItems.add(ListTile(
       leading: Icon(AppIcons.menuRight, color: appTheme.colors.primary),
-      title: Text(AppString.deservedRights, style: TextStyle(color: appTheme.colors.fontDark)),
+      title: Text(AppString.deservedRights, style: appTheme.textStyles.subtitleBold),
       onTap: () async {
         await navigator.pushDeservedRights(context);
       },
@@ -178,7 +183,7 @@ class _MainDrawer extends StatelessWidget {
 
     drawerItems.add(ListTile(
       leading: Icon(AppIcons.menuRight, color: appTheme.colors.primary),
-      title: Text(AppString.documents, style: TextStyle(color: appTheme.colors.fontDark)),
+      title: Text(AppString.documents, style: appTheme.textStyles.subtitleBold),
       onTap: () async {
         await navigator.pushDocuments(context);
       },
@@ -189,7 +194,7 @@ class _MainDrawer extends StatelessWidget {
     if (!kReleaseMode) {
       drawerItems.add(ListTile(
         leading: Icon(AppIcons.menuRight, color: appTheme.colors.primary),
-        title: Text('Theme Showcase', style: TextStyle(color: appTheme.colors.fontDark)),
+        title: Text('Theme Showcase', style: appTheme.textStyles.subtitleBold),
         onTap: () {
           navigator.pop(context);
           navigator.pushThemeTest(context);

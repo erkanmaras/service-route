@@ -74,8 +74,12 @@ class _DocumentsPageState extends State<DocumentsPage> {
               color: appTheme.colors.primary,
             ),
             title: Text(document.description),
-            subtitle: Text('Lorem ipsum dolor sit amet'),
-            trailing: Icon(AppIcons.chevronRight),
+            subtitle: Text('Lorem ipsum dolor sit amet',
+                style: appTheme.textStyles.subtitle.copyWith(color: appTheme.colors.fontPale)),
+            trailing: Icon(
+              AppIcons.chevronRight,
+              color: appTheme.colors.primary,
+            ),
           ),
         );
       },
