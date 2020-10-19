@@ -516,7 +516,7 @@ class _ThemeTestPageState extends State<ThemeTestPage> {
       TextButton(
         onPressed: () {
           MessageDialog.info(
-              context: context, content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', title: 'Info');
+              context: context, message: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', title: 'Info');
         },
         child: Text(
           'Show Info Message',
@@ -663,7 +663,7 @@ class _ThemeTestPageState extends State<ThemeTestPage> {
           logger.warning('warning Mesaj');
           logger.error('error Mesaj');
           logger.critical('critical Mesaj');
-          await MessageDialog.info(context: context, content: 'Look at the debug console', title: 'Info');
+          await MessageDialog.info(context: context, message: 'Look at the debug console', title: 'Info');
         },
         child: Text(
           'LogDebugPrint Test',

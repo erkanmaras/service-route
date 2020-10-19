@@ -29,8 +29,8 @@ class AppString {
   static const String deservedRights = 'Hak Edişler';
   static const String locationInfoCollecting = 'Konum bilgisi alınıyor...';
   static const String lastLocation = 'Son Konum';
-  static const String locationServiceNotEnable = 'Konum servisi aktif değil!';
-  static const String locationPermissionNotGranted = 'Konum erişim izini verilmemiş!';
+  static const String toContinueTurnOnDeviceLocation = 'Devam etmek için, cihazınızın konum servisini açınız!';
+  static const String locationPermissionMustBeGranted = 'Konum servisine erişim izni vermelisiniz!';
   static const String serviceRouteList = 'Sefer Listesi';
   static const String serviceRoute = 'Sefer';
   static const String loading = 'Yükleniyor';

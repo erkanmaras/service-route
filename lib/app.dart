@@ -184,7 +184,7 @@ class _AppColors extends DefaultThemeColors {
   @override
   Color get divider => Color(0xffd9e1f2);
   @override
-  Color get font => Color(0xff15254E);
+  Color get font => Color(0xff2E4378);
   @override
   Color get fontPale => Color(0xff8291b8);
 }

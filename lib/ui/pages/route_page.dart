@@ -182,13 +182,13 @@ class _RoutePageState extends State<RoutePage> {
   ) async {
     var locationPermissionGranted = await AppPermission.locationPermissionGranted();
     if (!locationPermissionGranted) {
-      await MessageDialog.error(context: context, message: AppString.locationPermissionNotGranted);
+      await MessageDialog.error(context: context, message: AppString.locationPermissionMustBeGranted);
       return;
     }
 
     var locationServiceEnable = await AppPermission.locationServiceEnable();
     if (!locationServiceEnable) {
-      await MessageDialog.error(context: context, message: AppString.locationServiceNotEnable);
+      await MessageDialog.info(context: context, message: AppString.toContinueTurnOnDeviceLocation);
       return;
     }
 

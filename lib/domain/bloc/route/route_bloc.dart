@@ -22,7 +22,7 @@ class RouteBloc extends Cubit<RouteState> {
 
   int maxLocationErrorCount = 3;
   Future<void> addPassengerLocation(Location location) async {
-    return _addMarker(
+    return _addLocation(
       LocationType.passenger,
       location,
       BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
@@ -30,14 +30,14 @@ class RouteBloc extends Cubit<RouteState> {
   }
 
   Future<void> addRouteLocation(Location location) async {
-    return _addMarker(
+    return _addLocation(
       LocationType.route,
       location,
       BitmapDescriptor.defaultMarker,
     );
   }
 
-  Future<void> _addMarker(
+  Future<void> _addLocation(
     LocationType locationType,
     Location location,
     BitmapDescriptor icon,
@@ -111,7 +111,7 @@ enum LocationType { route, passenger }
 class _RouteFile {
   static Future<void> writeAsString(String log) async {
     final file = await getFile();
-    await file.writeAsString(log, mode: FileMode.append);
+    await file.writeAsString('$log\n', mode: FileMode.append);
   }
 
   static Future<bool> fileExists() async {
