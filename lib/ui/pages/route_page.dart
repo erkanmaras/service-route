@@ -63,6 +63,7 @@ class _RoutePageState extends State<RoutePage> {
       }, builder: (context, state) {
         var initialState = RouteState.initial();
         return Scaffold(
+          resizeToAvoidBottomInset: false,
           appBar: AppBar(
             automaticallyImplyLeading: !state.locating,
             title: const Text(AppString.serviceRoute),
