@@ -74,9 +74,20 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                               Visibility(
-                                visible: !mediaQuery.keyboardVisible(),
-                                child: _LoginFooter(),
-                              )
+                                  visible: !mediaQuery.keyboardVisible(),
+                                  child: Container(
+                                      height: 80,
+                                      color: appTheme.colors.canvas,
+                                      child: ClipPath(
+                                        clipper: _HeaderClipper(
+                                          yLine: 60,
+                                          y1Bezier: 100,
+                                          y2bezier: 0,
+                                        ),
+                                        child: Container(
+                                          color: Colors.white,
+                                        ),
+                                      )))
                             ],
                           ),
                         )
@@ -326,25 +337,6 @@ class _LoginBodyState extends State<_LoginBody> {
     );
     await settingsRepository.saveUser(userSettings);
     appContext.setAppSettings(user: userSettings);
-  }
-}
-
-class _LoginFooter extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        height: 80,
-        color: context.getTheme().colors.canvas,
-        child: ClipPath(
-          clipper: _HeaderClipper(
-            yLine: 60,
-            y1Bezier: 100,
-            y2bezier: 0,
-          ),
-          child: Container(
-            color: Colors.white,
-          ),
-        ));
   }
 }
 

@@ -170,6 +170,8 @@ class AppWidget extends StatelessWidget {
 
 class _AppColors extends DefaultThemeColors {
   @override
+  Color get inputFillColor => Color(0xFFF6F8FC);
+  @override
   Color get accent => Color(0xff15254E);
   @override
   Color get primary => Color(0xff0083FF);

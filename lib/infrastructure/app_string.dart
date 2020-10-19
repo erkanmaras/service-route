@@ -8,6 +8,7 @@ class AppString {
   static const String done = 'Bitir';
   static const String logout = 'Çıkış';
   static const String takePassenger = 'Yolcu Al';
+    static const String passengerName = 'Yolcu Adı';
   static const String anUnExpectedErrorOccurred = 'Beklenmeyen bir hata oluştu!';
   static const String authenticationParameterMissing = 'Giriş bilgileri eksik!';
   static const String recordNotFound = 'Kayıt bulunamadı!';

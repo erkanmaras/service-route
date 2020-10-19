@@ -202,8 +202,6 @@ class _RoutePageState extends State<RoutePage> {
       updateIntervalInSecond: 10,
     );
 
-    // Location newLocation = await Locator.getLastLocation();
-
     await context.getBloc<RouteBloc>().startLocating();
   }
 
@@ -235,7 +233,7 @@ class _RoutePageState extends State<RoutePage> {
   ) async {
     Location newLocation = await Locator.getLastLocation();
 
-    await TextInputDialog.show(context, 'Yolcu Adı');
+    //  await TextInputDialog.show(context, AppString.passengerName);
     await context.getBloc<RouteBloc>().addPassengerLocation(newLocation);
   }
 
