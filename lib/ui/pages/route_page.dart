@@ -37,6 +37,7 @@ class _RoutePageState extends State<RoutePage> {
   @override
   void dispose() {
     Locator.stop();
+    mapController?.dispose();
     super.dispose();
   }
 
@@ -131,9 +132,7 @@ class _RoutePageState extends State<RoutePage> {
     return buildStartAction(context);
   }
 
-  Widget buildStartAction(
-    BuildContext context,
-  ) {
+  Widget buildStartAction(BuildContext context) {
     return Align(
       alignment: Alignment.center,
       child: buildButton(
@@ -145,9 +144,7 @@ class _RoutePageState extends State<RoutePage> {
     );
   }
 
-  Widget buildTrackingAction(
-    BuildContext context,
-  ) {
+  Widget buildTrackingAction(BuildContext context) {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Padding(
@@ -177,9 +174,7 @@ class _RoutePageState extends State<RoutePage> {
     this.mapController = mapController;
   }
 
-  Future<void> onStart(
-    BuildContext context,
-  ) async {
+  Future<void> onStart(BuildContext context) async {
     var locationPermissionGranted = await AppPermission.locationPermissionGranted();
     if (!locationPermissionGranted) {
       await MessageDialog.error(context: context, message: AppString.locationPermissionMustBeGranted);
@@ -253,7 +248,8 @@ class _RoutePageState extends State<RoutePage> {
           side: BorderSide(color: Colors.white, width: sizeMultiplier),
         ),
         onPressed: onPressed,
-        child: Text(text, style: appTheme.textStyles.title.copyWith(color: appTheme.colors.fontLight)));
+        child:
+            Text(text, style: appTheme.textStyles.title.copyWith(color: appTheme.colors.fontLight)));
   }
 }
 

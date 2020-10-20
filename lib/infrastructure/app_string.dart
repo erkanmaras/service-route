@@ -8,7 +8,7 @@ class AppString {
   static const String done = 'Bitir';
   static const String logout = 'Çıkış';
   static const String takePassenger = 'Yolcu Al';
-    static const String passengerName = 'Yolcu Adı';
+  static const String passengerName = 'Yolcu Adı';
   static const String anUnExpectedErrorOccurred = 'Beklenmeyen bir hata oluştu!';
   static const String authenticationParameterMissing = 'Giriş bilgileri eksik!';
   static const String recordNotFound = 'Kayıt bulunamadı!';
@@ -27,9 +27,16 @@ class AppString {
   static const String documents = 'Dokümanlar';
   static const String documentUpload = 'Doküman Yükle';
   static const String deservedRights = 'Hak Edişler';
+  static const String pickImageFromGallery = 'Galeriden Seç';
+  static const String pickImageFromCamera = 'Fofograf Çek';
+  static const String history = 'Geçmiş';
+  static const String upload = 'Yükle';
+  static const String documentUploading = 'Doküman gönderiliyor...';
+  static const String documentUploadComplete = 'Doküman gönderildi!';
   static const String locationInfoCollecting = 'Konum bilgisi alınıyor...';
   static const String lastLocation = 'Son Konum';
-  static const String toContinueTurnOnDeviceLocation = 'Devam etmek için, cihazınızın konum servisini açınız!';
+  static const String toContinueTurnOnDeviceLocation =
+      'Devam etmek için cihazınızın konum özelliğini açmanız gerekmektedir';
   static const String locationPermissionMustBeGranted = 'Konum servisine erişim izni vermelisiniz!';
   static const String serviceRouteList = 'Sefer Listesi';
   static const String serviceRoute = 'Sefer';

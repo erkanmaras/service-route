@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:service_route/data/data.dart';
@@ -69,14 +68,14 @@ class _UploadDocumentPage extends State<UploadDocumentPage> {
                         onPressed: () async {
                           if (state.hasFile) {
                             await WaitDialog.scope(
-                              waitMessage: 'Doküman gönderiliyor...',
+                              waitMessage: AppString.documentUploading,
                               context: context,
                               call: (_) async => context.getBloc<UploadDocumentBloc>().uploadSelectedDocument(),
                             );
-                            SnackBarAlert.info(context: context, message: 'Doküman gönderildi!');
+                            SnackBarAlert.info(context: context, message: AppString.documentUploadComplete);
                           }
                         },
-                        label: Text('Yükle'),
+                        label: Text(AppString.upload),
                         icon: Icon(
                           AppIcons.upload,
                         )),
@@ -109,25 +108,13 @@ class _UploadDocumentPage extends State<UploadDocumentPage> {
                                 ),
                                 ExpandedRow(
                                   children: [
-                                    //ElevatedButton(
-                                    //     // style: ElevatedButton.styleFrom(
-                                    //     //     backgroundColor: appTheme.colors.primary.withOpacity(0.1),
-                                    //     //     ),
-                                    //     onPressed: () {},
-                                    //     child: Text('Galeriden Seç')),
-                                    // OutlinedButton(
-                                    //     style: OutlinedButton.styleFrom(
-                                    //       backgroundColor: appTheme.colors.primary.withOpacity(0.1),
-                                    //     ),
-                                    //     onPressed: () {},
-                                    //     child: Text('Galeriden Seç')),
                                     Padding(
                                       padding: const EdgeInsets.all(10),
                                       child: ElevatedButton(
                                           onPressed: () async {
                                             await pickImageFromGallery(context);
                                           },
-                                          child: Text('Galeriden Seç')),
+                                          child: Text(AppString.pickImageFromGallery)),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(10),
@@ -135,7 +122,7 @@ class _UploadDocumentPage extends State<UploadDocumentPage> {
                                           onPressed: () async {
                                             await pickImageFromCamera(context);
                                           },
-                                          child: Text('Fofograf Çek')),
+                                          child: Text(AppString.pickImageFromCamera)),
                                     )
                                   ],
                                 ),
@@ -192,7 +179,7 @@ class _UploadedFiles extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  'Geçmiş',
+                  AppString.history,
                   style: appTheme.textStyles.bodyBold,
                 ),
               ],

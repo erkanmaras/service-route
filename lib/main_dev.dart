@@ -1,4 +1,3 @@
- 
 import 'package:service_route/app.dart';
 import 'package:service_route/data/api_providers/fake/service_route_api_fake.dart';
 import 'package:service_route/data/data.dart';
@@ -38,8 +37,7 @@ class _AppDevelopment extends App {
   }
 }
 
-
-class AppBlocObserver  extends BlocObserver  {
+class AppBlocObserver extends BlocObserver {
   @override
   void onEvent(Bloc bloc, Object event) {
     super.onEvent(bloc, event);
@@ -51,8 +49,7 @@ class AppBlocObserver  extends BlocObserver  {
     super.onTransition(bloc, transition);
     debugPrint('$transition');
   }
-  
-  
+
   @override
   void onError(Cubit cubit, Object error, StackTrace stackTrace) {
     super.onError(cubit, error, stackTrace);
