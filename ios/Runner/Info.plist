@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Servis Rota</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -22,6 +24,22 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>The camera will be used to take the document photo.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>The location information collected will be used to measure the distance traveled.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>The location information collected will be used to measure the distance traveled.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>The location information collected will be used to measure the distance traveled.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>The microphone will be used to recod audio.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>The Photo library will be used to save the document photo.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -41,28 +59,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<!-- Modified -->
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>location</string>
-	</array>
-	 <!-- for iOS 11 + -->
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>The location information collected will be used to measure the distance traveled.</string>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>The location information collected will be used to measure the distance traveled.</string>
-
-    <!-- additionally for iOS 9/10, if you need always permission -->
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>The location information collected will be used to measure the distance traveled.</string>
-  
-    <!-- image picker-->
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>The Photo library will be used to save the document photo.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>The microphone will be used to recod audio.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>The camera will be used to take the document photo.</string>
-	 <!-- Modified -->
 </dict>
 </plist>
