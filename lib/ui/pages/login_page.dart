@@ -174,17 +174,17 @@ class _LoginHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(left: 30),
+                  padding: const EdgeInsets.only(left: 25),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
                       Text(
-                        'Servis Rota',
+                        AppString.appName,
                         style: Theme.of(context).textTheme.headline5.copyWith(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        '            by Öz Ata Tur',
+                        'by Öz Ata Tur',
                         style: Theme.of(context).textTheme.bodyText1.copyWith(color: appTheme.colors.fontPale),
                       ),
                     ],
@@ -231,7 +231,7 @@ class _LoginBodyState extends State<_LoginBody> {
   final userCredentialFormKey = GlobalKey<FormState>();
 
   bool isPasswordVisible = false;
-
+  List<ServiceRoute> serviceRoutes;
   IServiceRouteRepository serviceRouteRepository;
   ISettingsRepository settingsRepository;
   AppNavigator navigator;
@@ -306,12 +306,13 @@ class _LoginBodyState extends State<_LoginBody> {
                           startProcessing();
 
                           var bloc = context.getBloc<AuthenticationBloc>();
-                          await bloc.authentication(AuthenticationModel(
-                            userName: tecUserName.text,
-                            password: tecPassword.text,
-                          ));
-                          var serviceRoutes = await serviceRouteRepository.getServiceRoutes();
-                          await navigator.pushAndRemoveUntilHome(context, serviceRoutes);
+                          await bloc.authentication(
+                              AuthenticationModel(
+                                userName: tecUserName.text,
+                                password: tecPassword.text,
+                              ), onSuccess: () async {
+                            serviceRoutes = await serviceRouteRepository.getServiceRoutes();
+                          });
                         } finally {
                           stopProcessing();
                         }
@@ -337,6 +338,7 @@ class _LoginBodyState extends State<_LoginBody> {
     );
     await settingsRepository.saveUser(userSettings);
     appContext.setAppSettings(user: userSettings);
+    await navigator.pushAndRemoveUntilHome(context, serviceRoutes);
   }
 }
 

@@ -14,27 +14,18 @@ class ServiceRouteApi {
   final Logger logger;
   Dio dio;
 
-  // String get _authorizationToken {
-  //   _validateInitialized();
-  //   return appContext.user.authToken.token;
-  // }
+  String get _authorizationToken {
+    _validateInitialized();
+    return appContext.user.authToken.token;
+  }
 
   Options get _requestOptions {
-    return Options(headers: <String, dynamic>{
-      //'Authorization': 'Bearer $_authorizationToken'
-    });
+    return Options(headers: <String, dynamic>{'token': '$_authorizationToken'});
   }
 
   void initialize() {
     dio ??= Dio();
-    var baseUrl = '127.0.0.1';
-    if (!baseUrl.startsWith('http')) {
-      baseUrl = 'http://$baseUrl';
-    }
-
-    if (!baseUrl.endsWith('/api/')) {
-      baseUrl = '$baseUrl/api/';
-    }
+    var baseUrl = 'http://api.servisrotasi.com';
 
     dio.options.baseUrl = baseUrl;
     dio.options.responseType = ResponseType.json;
@@ -51,13 +42,14 @@ class ServiceRouteApi {
     //dio.interceptors.add(AuthorizationTokenRefresh(dio, model));
   }
 
-  // void _validateInitialized() {
-  //   dio ??= throw AppError(message: 'V3StoreApi not initialized!');
-  // }
+  void _validateInitialized() {
+    dio ??= throw AppError(message: 'V3StoreApi not initialized!');
+  }
 
   Future<AuthenticationToken> authenticate(AuthenticationModel model) async {
+    var queryParameters = <String, dynamic>{'userName': model.userName, 'password': model.password};
     try {
-      final response = await dio.post<String>('login', data: model.toJson());
+      final response = await dio.get<String>('login', queryParameters: queryParameters);
       return AuthenticationToken.fromJson(await jsonDecodeAsync(response.data) as Map<String, dynamic>);
     } catch (e) {
       throw ApiException.fromError(e);

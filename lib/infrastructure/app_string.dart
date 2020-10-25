@@ -1,7 +1,7 @@
 //Localizable string constants.
 
 class AppString {
-  static const String appName = 'Servis Rota';
+  static const String appName = 'Servis Rotası';
   static const String start = 'Başla';
   static const String ok = 'Tamam';
   static const String error = 'Hata';
