@@ -19,11 +19,11 @@ class _DocumentsPageState extends State<DocumentsPage> {
   IServiceRouteRepository iserviceRouteRepository;
   AppTheme appTheme;
   AppNavigator appNavigator;
-  Future<List<ServiceDocument>> serviceDocuments;
+  List<DocumentCategory> documentCategories;
 
   @override
   void initState() {
-    serviceDocuments = iserviceRouteRepository.getServiceDocuments();
+    documentCategories = iserviceRouteRepository.getServiceDocumentCategories();
     super.initState();
   }
 
@@ -41,53 +41,32 @@ class _DocumentsPageState extends State<DocumentsPage> {
         actions: <Widget>[],
       ),
       body: ContentContainer(
-        child: FutureBuilder<List<ServiceDocument>>(
-            future: serviceDocuments,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return BackgroundHint.loading(context, AppString.loading);
-              } else {
-                if (snapshot.hasError) {
-                  return BackgroundHint.unExpectedError(context);
-                } else if (!snapshot.hasData || snapshot.data.isNullOrEmpty()) {
-                  return BackgroundHint.noData(context);
-                } else {
-                  return buildBody(snapshot.data);
-                }
-              }
-            }),
-      ),
+          child: ListView.separated(
+        separatorBuilder: (context, index) => IndentDivider(),
+        itemBuilder: (context, index) {
+          var document = documentCategories[index];
+          return Card(
+            elevation: 0,
+            child: ListTile(
+              onTap: () => onTabRoute(document),
+              leading: Icon(
+                AppIcons.fileDocumentOutline,
+                color: appTheme.colors.primary,
+              ),
+              title: Text(document.name),
+              trailing: Icon(
+                AppIcons.chevronRight,
+                color: appTheme.colors.primary,
+              ),
+            ),
+          );
+        },
+        itemCount: documentCategories.length,
+      )),
     );
   }
 
-  Widget buildBody(List<ServiceDocument> serviceDocuments) {
-    return ListView.separated(
-      separatorBuilder: (context, index) => IndentDivider(),
-      itemBuilder: (context, index) {
-        var document = serviceDocuments[index];
-        return Card(
-          elevation: 0,
-          child: ListTile(
-            onTap: () => onTabRoute(document),
-            leading: Icon(
-              AppIcons.fileDocumentOutline,
-              color: appTheme.colors.primary,
-            ),
-            title: Text(document.description),
-            subtitle: Text('Lorem ipsum dolor sit amet',
-                style: appTheme.textStyles.subtitle.copyWith(color: appTheme.colors.fontPale)),
-            trailing: Icon(
-              AppIcons.chevronRight,
-              color: appTheme.colors.primary,
-            ),
-          ),
-        );
-      },
-      itemCount: serviceDocuments.length,
-    );
-  }
-
-  void onTabRoute(ServiceDocument selectedDocument) {
-    appNavigator.pushDocumentUpload(context, selectedDocument);
+  void onTabRoute(DocumentCategory documentCategory) {
+    appNavigator.pushDocumentUpload(context, documentCategory);
   }
 }

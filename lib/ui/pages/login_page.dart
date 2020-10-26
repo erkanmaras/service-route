@@ -15,14 +15,16 @@ class _LoginPageState extends State<LoginPage> {
   _LoginPageState()
       : navigator = AppService.get<AppNavigator>(),
         logger = AppService.get<Logger>(),
-        repository = AppService.get<IServiceRouteRepository>(),
+        serviceRouteRepository = AppService.get<IServiceRouteRepository>(),
+        settingsRepository = AppService.get<ISettingsRepository>(),
         appContext = AppService.get<AppContext>();
 
   AppTheme appTheme;
   MediaQueryData mediaQuery;
   AppNavigator navigator;
   Logger logger;
-  IServiceRouteRepository repository;
+  IServiceRouteRepository serviceRouteRepository;
+  ISettingsRepository settingsRepository;
   AppContext appContext;
   @override
   void initState() {
@@ -50,7 +52,12 @@ class _LoginPageState extends State<LoginPage> {
         child: Scaffold(
             backgroundColor: appTheme.colors.canvasLight,
             body: BlocProvider<AuthenticationBloc>(
-                create: (context) => AuthenticationBloc(repository: repository, appContext: appContext, logger: logger),
+                create: (context) => AuthenticationBloc(
+                      serviceRouteRepository: serviceRouteRepository,
+                      settingsRepository: settingsRepository,
+                      appContext: appContext,
+                      logger: logger,
+                    ),
                 child: Builder(builder: (context) {
                   return SafeArea(
                       child: ScrollConfiguration(
@@ -181,11 +188,11 @@ class _LoginHeader extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         AppString.appName,
-                        style: Theme.of(context).textTheme.headline5.copyWith(fontWeight: FontWeight.bold),
+                        style: appTheme.data.textTheme.headline5.copyWith(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        'by Öz Ata Tur',
-                        style: Theme.of(context).textTheme.bodyText1.copyWith(color: appTheme.colors.fontPale),
+                        'by Özata Tur',
+                        style: appTheme.data.textTheme.bodyText1.copyWith(color: appTheme.colors.fontPale),
                       ),
                     ],
                   ),
@@ -231,7 +238,7 @@ class _LoginBodyState extends State<_LoginBody> {
   final userCredentialFormKey = GlobalKey<FormState>();
 
   bool isPasswordVisible = false;
-  List<ServiceRoute> serviceRoutes;
+  List<TransferRoute> serviceRoutes;
   IServiceRouteRepository serviceRouteRepository;
   ISettingsRepository settingsRepository;
   AppNavigator navigator;
@@ -311,7 +318,7 @@ class _LoginBodyState extends State<_LoginBody> {
                                 userName: tecUserName.text,
                                 password: tecPassword.text,
                               ), onSuccess: () async {
-                            serviceRoutes = await serviceRouteRepository.getServiceRoutes();
+                            serviceRoutes = await serviceRouteRepository.getTransferRoutes();
                           });
                         } finally {
                           stopProcessing();
@@ -333,11 +340,6 @@ class _LoginBodyState extends State<_LoginBody> {
   }
 
   Future<void> onLoginSuccess() async {
-    var userSettings = UserSettings(
-      userName: tecUserName.text,
-    );
-    await settingsRepository.saveUser(userSettings);
-    appContext.setAppSettings(user: userSettings);
     await navigator.pushAndRemoveUntilHome(context, serviceRoutes);
   }
 }

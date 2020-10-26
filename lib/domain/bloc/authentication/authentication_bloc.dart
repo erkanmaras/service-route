@@ -7,12 +7,18 @@ import 'package:service_route/infrastructure/infrastructure.dart';
 export 'package:service_route/domain/bloc/authentication/authentication_state.dart';
 
 class AuthenticationBloc extends Cubit<AuthenticationState> {
-  AuthenticationBloc({@required this.repository, @required this.appContext, @required this.logger})
-      : assert(repository != null),
+  AuthenticationBloc(
+      {@required this.serviceRouteRepository,
+      @required this.settingsRepository,
+      @required this.appContext,
+      @required this.logger})
+      : assert(serviceRouteRepository != null),
+        assert(settingsRepository != null),
         assert(logger != null),
         super(AuthenticationInitial());
 
-  final IServiceRouteRepository repository;
+  final IServiceRouteRepository serviceRouteRepository;
+  final ISettingsRepository settingsRepository;
   final Logger logger;
   final AppContext appContext;
 
@@ -26,12 +32,20 @@ class AuthenticationBloc extends Cubit<AuthenticationState> {
       } else {
         emit(Authenticating());
 
-        var authToken = await repository.authenticate(authModel);
+        var authToken = await serviceRouteRepository.authenticate(authModel);
         appContext.setAppUser(
           authToken,
           authModel.userName,
           authModel.password,
         );
+
+        var userSettings = UserSettings(
+          userName: authModel.userName,
+        );
+        await settingsRepository.saveUser(userSettings);
+        var appSettings = await serviceRouteRepository.getApplicationSettings();
+
+        appContext.setAppSettings(user: userSettings, app: appSettings);
 
         //onSuccess Authentication işleminde animasyon (progress button) içerisinde ekstra yapılması gereken
         //işlemler için gerekli.

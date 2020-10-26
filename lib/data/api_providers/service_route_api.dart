@@ -25,7 +25,7 @@ class ServiceRouteApi {
 
   void initialize() {
     dio ??= Dio();
-    var baseUrl = 'http://api.servisrotasi.com';
+    var baseUrl = 'http://api.servisrotasi.com/api/mobile/';
 
     dio.options.baseUrl = baseUrl;
     dio.options.responseType = ResponseType.json;
@@ -56,48 +56,41 @@ class ServiceRouteApi {
     }
   }
 
-  Future<List<ServiceRoute>> getServiceRoutes() async {
+  Future<ApplicationSettings> getApplicationSettings() async {
     try {
-      final response = await dio.get<String>(
-        'service-routes',
-        options: _requestOptions,
-      );
-      final list = await jsonDecodeAsync(response.data) as List<dynamic>;
-      return list.map<ServiceRoute>((dynamic model) => ServiceRoute.fromJson(model as Map<String, dynamic>)).toList();
+      final response = await dio.get<String>('config', options: _requestOptions);
+      return ApplicationSettings.fromJson(await jsonDecodeAsync(response.data) as Map<String, dynamic>);
     } catch (e) {
       throw ApiException.fromError(e);
     }
   }
 
-  Future<List<DeservedRight>> getDeservedRights() async {
+  Future<List<TransferRoute>> getTransferRoutes() async {
+    try {
+      final response = await dio.get<String>('transfer', options: _requestOptions);
+      final list = await jsonDecodeAsync(response.data) as List<dynamic>;
+      return list.map<TransferRoute>((dynamic model) => TransferRoute.fromJson(model as Map<String, dynamic>)).toList();
+    } catch (e) {
+      throw ApiException.fromError(e);
+    }
+  }
+
+  Future<List<CompletedTransfer>> getCompletedTransfers() async {
     try {
       final response = await dio.get<String>(
         'deserved-right',
         options: _requestOptions,
       );
       final list = await jsonDecodeAsync(response.data) as List<dynamic>;
-      return list.map<DeservedRight>((dynamic model) => DeservedRight.fromJson(model as Map<String, dynamic>)).toList();
-    } catch (e) {
-      throw ApiException.fromError(e);
-    }
-  }
-
-  Future<List<ServiceDocument>> getServiceDocuments() async {
-    try {
-      final response = await dio.get<String>(
-        'service-document',
-        options: _requestOptions,
-      );
-      final list = await jsonDecodeAsync(response.data) as List<dynamic>;
       return list
-          .map<ServiceDocument>((dynamic model) => ServiceDocument.fromJson(model as Map<String, dynamic>))
+          .map<CompletedTransfer>((dynamic model) => CompletedTransfer.fromJson(model as Map<String, dynamic>))
           .toList();
     } catch (e) {
       throw ApiException.fromError(e);
     }
   }
 
-  Future<void> uploadServiceRouteFile(File file) async {
+  Future<void> uploadTransferFile(File file) async {
     String fileName = file.path.split('/').last;
     FormData formData = FormData.fromMap(<String, MultipartFile>{
       'file': await MultipartFile.fromFile(file.path, filename: fileName),

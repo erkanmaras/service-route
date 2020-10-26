@@ -8,16 +8,16 @@ import 'package:service_route/ui/ui.dart';
 import 'package:service_route/infrastructure/infrastructure.dart';
 import 'package:wakelock/wakelock.dart';
 
-class RoutePage extends StatefulWidget {
-  RoutePage({@required this.serviceRoute});
+class TransferPage extends StatefulWidget {
+  TransferPage({@required this.serviceRoute});
 
-  final ServiceRoute serviceRoute;
+  final TransferRoute serviceRoute;
   @override
-  _RoutePageState createState() => _RoutePageState();
+  _TransferPageState createState() => _TransferPageState();
 }
 
-class _RoutePageState extends State<RoutePage> {
-  _RoutePageState()
+class _TransferPageState extends State<TransferPage> {
+  _TransferPageState()
       : logger = AppService.get<Logger>(),
         repository = AppService.get<IServiceRouteRepository>(),
         appNavigator = AppService.get<AppNavigator>();
@@ -51,23 +51,23 @@ class _RoutePageState extends State<RoutePage> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<RouteBloc>(
-          create: (BuildContext context) => RouteBloc(repository: repository, logger: logger),
+        BlocProvider<TransferBloc>(
+          create: (BuildContext context) => TransferBloc(repository: repository, logger: logger),
         ),
       ],
-      child: BlocConsumer<RouteBloc, RouteState>(listener: (context, state) {
-        if (state is RouteFailState) {
+      child: BlocConsumer<TransferBloc, TransferState>(listener: (context, state) {
+        if (state is TransferFailState) {
           SnackBarAlert.error(context: context, message: state.reason);
           return;
         }
         mapController.moveCamera(CameraUpdate.newLatLngZoom(state.latLng, state.zoom));
       }, builder: (context, state) {
-        var initialState = RouteState.initial();
+        var initialState = TransferState.initial();
         return Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
             automaticallyImplyLeading: !state.locating,
-            title: const Text(AppString.serviceRoute),
+            title: const Text(AppString.transfer),
             actions: <Widget>[
               Row(
                 children: [
@@ -94,7 +94,7 @@ class _RoutePageState extends State<RoutePage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   CardTitle(
-                    title: widget.serviceRoute.description,
+                    title: widget.serviceRoute.accountDescription,
                   ),
                   SizedBox(
                     height: 5,
@@ -125,7 +125,7 @@ class _RoutePageState extends State<RoutePage> {
     );
   }
 
-  Widget buildActionButtons(BuildContext context, RouteState state) {
+  Widget buildActionButtons(BuildContext context, TransferState state) {
     if (state.locating) {
       return buildTrackingAction(context);
     }
@@ -188,7 +188,7 @@ class _RoutePageState extends State<RoutePage> {
     }
 
     Locator.getLocations((newLocation) {
-      context.getBloc<RouteBloc>().addRouteLocation(newLocation);
+      context.getBloc<TransferBloc>().addRouteLocation(newLocation);
     });
 
     await Locator.start(
@@ -197,7 +197,7 @@ class _RoutePageState extends State<RoutePage> {
       updateIntervalInSecond: 10,
     );
 
-    await context.getBloc<RouteBloc>().startLocating();
+    await context.getBloc<TransferBloc>().startLocating();
   }
 
   Future<void> onStop(
@@ -205,16 +205,16 @@ class _RoutePageState extends State<RoutePage> {
   ) async {
     var result = await MessageSheet.question(
       context: context,
-      message: AppString.areYouSureWantToCompleteServiceRoute,
+      message: AppString.areYouSureWantToCompleteTransfer,
       buttons: DialogButton.yesNo,
     );
     if (result == DialogResult.yes) {
       await Locator.stop();
-      var bloc = context.getBloc<RouteBloc>();
+      var bloc = context.getBloc<TransferBloc>();
 
       if (await bloc.fileExist()) {
         await WaitDialog.scope(
-          waitMessage: AppString.serviceRouteFileUploading,
+          waitMessage: AppString.transferFileUploading,
           context: context,
           call: (_) async => bloc.uploadFile(),
         );
@@ -227,9 +227,12 @@ class _RoutePageState extends State<RoutePage> {
     BuildContext context,
   ) async {
     Location newLocation = await Locator.getLastLocation();
-
-    //  await TextInputDialog.show(context, AppString.passengerName);
-    await context.getBloc<RouteBloc>().addPassengerLocation(newLocation);
+    var pointNameResult = await TextInputDialog.show(context, AppString.passengerName);
+    String pointName = '';
+    if (pointNameResult != null || pointNameResult.dialogResult == DialogResult.ok) {
+      pointName = pointNameResult.value;
+    }
+    await context.getBloc<TransferBloc>().addPointLocation(newLocation, pointName);
   }
 
   Widget buildButton({
@@ -248,8 +251,7 @@ class _RoutePageState extends State<RoutePage> {
           side: BorderSide(color: Colors.white, width: sizeMultiplier),
         ),
         onPressed: onPressed,
-        child:
-            Text(text, style: appTheme.textStyles.title.copyWith(color: appTheme.colors.fontLight)));
+        child: Text(text, style: appTheme.textStyles.title.copyWith(color: appTheme.colors.fontLight)));
   }
 }
 

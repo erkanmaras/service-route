@@ -7,8 +7,8 @@ import 'package:service_route/infrastructure/infrastructure.dart';
 import 'package:service_route/ui/ui.dart';
 
 class UploadDocumentPage extends StatefulWidget {
-  const UploadDocumentPage({Key key, this.serviceDocument}) : super(key: key);
-  final ServiceDocument serviceDocument;
+  const UploadDocumentPage({this.documentCategory});
+  final DocumentCategory documentCategory;
 
   @override
   _UploadDocumentPage createState() => _UploadDocumentPage();
@@ -91,7 +91,7 @@ class _UploadDocumentPage extends State<UploadDocumentPage> {
                       child: Column(
                         children: [
                           CardTitle(
-                            title: widget.serviceDocument.description,
+                            title: widget.documentCategory.name,
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 2),
@@ -144,6 +144,9 @@ class _UploadDocumentPage extends State<UploadDocumentPage> {
   Future<void> pickImageFromGallery(BuildContext context) async {
     try {
       var pickedFile = await picker.getImage(imageQuality: 50, source: ImageSource.gallery);
+      if (pickedFile == null) {
+        return;
+      }
       await context.getBloc<UploadDocumentBloc>().setSelectedFile(pickedFile.path);
     } catch (e, s) {
       logger.error(e, stackTrace: s);
@@ -154,6 +157,9 @@ class _UploadDocumentPage extends State<UploadDocumentPage> {
   Future<void> pickImageFromCamera(BuildContext context) async {
     try {
       var pickedFile = await picker.getImage(imageQuality: 50, source: ImageSource.camera);
+      if (pickedFile == null) {
+        return;
+      }
       await context.getBloc<UploadDocumentBloc>().setSelectedFile(pickedFile.path);
     } catch (e, s) {
       logger.error(e, stackTrace: s);

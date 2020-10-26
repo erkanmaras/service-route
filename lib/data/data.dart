@@ -4,9 +4,10 @@ export 'models/authentication_token.dart';
 export 'models/authentication_model.dart';
 export 'models/code_description.dart';
 export 'models/error_model.dart';
-export 'models/service_route.dart';
-export 'models/service_document.dart';
-export 'models/deserved_right.dart';
+export 'models/transfer_route.dart';
+export 'models/completed_transfer.dart';
+export 'models/document_category.dart';
+
 
 
 export 'api_providers/service_route_api.dart';

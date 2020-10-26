@@ -1,31 +1,30 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locator/locator.dart';
 import 'package:meta/meta.dart';
 import 'package:bloc/bloc.dart';
-import 'package:service_route/domain/bloc/route/route_state.dart';
+import 'package:service_route/domain/bloc/transfer/transfer_state.dart';
 import 'package:service_route/domain/domain.dart';
 import 'package:service_route/infrastructure/infrastructure.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-export 'package:service_route/domain/bloc/route/route_state.dart';
+export 'package:service_route/domain/bloc/transfer/transfer_state.dart';
 
-class RouteBloc extends Cubit<RouteState> {
-  RouteBloc({@required this.repository, @required this.logger})
+class TransferBloc extends Cubit<TransferState> {
+  TransferBloc({@required this.repository, @required this.logger})
       : assert(logger != null),
-        super(RouteState.initial());
+        super(TransferState.initial());
 
   final Logger logger;
   final IServiceRouteRepository repository;
 
   int maxLocationErrorCount = 3;
-  Future<void> addPassengerLocation(Location location) async {
+  Future<void> addPointLocation(Location location, String pointName) async {
     return _addLocation(
-      LocationType.passenger,
+      LocationType.point,
       location,
       BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+      name: pointName,
     );
   }
 
@@ -40,8 +39,9 @@ class RouteBloc extends Cubit<RouteState> {
   Future<void> _addLocation(
     LocationType locationType,
     Location location,
-    BitmapDescriptor icon,
-  ) async {
+    BitmapDescriptor icon, {
+    String name,
+  }) async {
     try {
       var markers = state.markers;
       markers.add(Marker(
@@ -49,11 +49,11 @@ class RouteBloc extends Cubit<RouteState> {
         position: LatLng(location.latitude, location.longitude),
         icon: icon,
       ));
-      await _writeToFile(locationType, location);
+      await _writeToFile(locationType, location, name);
       emit(state.copyWith(locating: true, location: location, markers: markers, zoom: 16));
     } catch (e, s) {
       maxLocationErrorCount -= 1;
-      emit(RouteFailState(reason: AppString.anUnExpectedErrorOccurred, state: state));
+      emit(TransferFailState(reason: AppString.anUnExpectedErrorOccurred, state: state));
       //throttle error , keep sentry quota
       if (maxLocationErrorCount > 0) {
         logger.error(e, stackTrace: s);
@@ -66,52 +66,50 @@ class RouteBloc extends Cubit<RouteState> {
       await deleteFile();
       emit(state.copyWith(locating: true));
     } on AppException catch (e, s) {
-      emit(RouteFailState(reason: e.message, state: state));
+      emit(TransferFailState(reason: e.message, state: state));
       logger.error(e, stackTrace: s);
     } catch (e, s) {
-      emit(RouteFailState(reason: AppString.anUnExpectedErrorOccurred, state: state));
+      emit(TransferFailState(reason: AppString.anUnExpectedErrorOccurred, state: state));
       logger.error(e, stackTrace: s);
     }
   }
 
   void stopLocating() {
-    emit(RouteState.initial());
+    emit(TransferState.initial());
   }
 
-  Future<void> _writeToFile(
-    LocationType locationType,
-    Location location,
-  ) async {
-    var map = _RouteFileEntry(locationType: locationType, latitude: location.latitude, longitude: location.longitude)
-        .toJson();
-    await _RouteFile.writeAsString(jsonEncode(map));
+  Future<void> _writeToFile(LocationType locationType, Location location, String name) async {
+    var line = _RouteFileEntry(
+            locationType: locationType, latitude: location.latitude, longitude: location.longitude, name: name)
+        .toString();
+    await _TransferFile.writeAsString(line);
   }
 
   Future<void> deleteFile() async {
-    return _RouteFile.delete();
+    return _TransferFile.delete();
   }
 
   Future<bool> fileExist() async {
-    return _RouteFile.fileExists();
+    return _TransferFile.fileExists();
   }
 
   Future<File> getFile() async {
-    return _RouteFile.getFile();
+    return _TransferFile.getFile();
   }
 
   Future<void> uploadFile() async {
-    var fileContent = await _RouteFile.readAsString();
+    var fileContent = await _TransferFile.readAsString();
     logger.debug(fileContent);
-    await repository.uploadServiceRouteFile(await _RouteFile.getFile());
+    await repository.uploadTransferFile(await _TransferFile.getFile());
   }
 }
 
-enum LocationType { route, passenger }
+enum LocationType { route, point }
 
-class _RouteFile {
+class _TransferFile {
   static Future<void> writeAsString(String log) async {
     final file = await getFile();
-    await file.writeAsString('$log\n', mode: FileMode.append);
+    await file.writeAsString(log, mode: FileMode.append);
   }
 
   static Future<bool> fileExists() async {
@@ -146,20 +144,28 @@ class _RouteFile {
 }
 
 class _RouteFileEntry {
-  _RouteFileEntry({this.locationType, this.latitude, this.longitude});
+  _RouteFileEntry({
+    this.locationType,
+    this.latitude,
+    this.longitude,
+    this.name,
+  });
 
-  // factory _RouteFileEntry.fromJson(Map<String, dynamic> json) => _RouteFileEntry(
-  //       locationType: LocationType.values[json.getValue<int>('locationType')],
-  //       latitude: json.getValue<double>('latitude'),
-  //       longitude: json.getValue<double>('longitude'),
-  //     );
+  @override
+  String toString() {
+    var line = StringBuffer();
+    line.write(locationType.index);
+    line.write(',$latitude');
+    line.write(',$longitude');
+    if (!name.isNullOrWhiteSpace()) {
+      line.write(',$name');
+    }
+    line.writeln();
 
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'locationType': locationType.index,
-        'latitude': latitude,
-        'longitude': longitude,
-      };
+    return line.toString();
+  }
 
+  final String name;
   final LocationType locationType;
   final double latitude;
   final double longitude;

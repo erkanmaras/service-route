@@ -8,7 +8,7 @@ import 'package:service_route/ui/ui.dart';
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.serviceRoutes}) : super(key: key);
 
-  final List<ServiceRoute> serviceRoutes;
+  final List<TransferRoute> serviceRoutes;
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -23,10 +23,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final AppContext appContext;
   IServiceRouteRepository iserviceRouteRepository;
   AppTheme appTheme;
-  Future<List<ServiceRoute>> serviceRoutes;
+  Future<List<TransferRoute>> serviceRoutes;
   @override
   void initState() {
-    serviceRoutes = iserviceRouteRepository.getServiceRoutes();
+    serviceRoutes = iserviceRouteRepository.getTransferRoutes();
     super.initState();
   }
 
@@ -40,11 +40,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(AppString.serviceRouteList),
+          title: Text(AppString.transferList),
         ),
         drawer: _MainDrawer(),
         body: ContentContainer(
-            child: FutureBuilder<List<ServiceRoute>>(
+            child: FutureBuilder<List<TransferRoute>>(
                 future: serviceRoutes,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -61,32 +61,32 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 })));
   }
 
-  Future<void> onTabRoute(BuildContext context, ServiceRoute selectedServiceRoute) async {
+  Future<void> onTabRoute(BuildContext context, TransferRoute selectedServiceRoute) async {
     var result = await openServiceRoutePage(selectedServiceRoute);
     if (result != null && result == true) {
-      SnackBarAlert.info(context: context, message: AppString.serviceRouteFileUploaded);
+      SnackBarAlert.info(context: context, message: AppString.transferFileUploaded);
     }
   }
 
-  Future<bool> openServiceRoutePage(ServiceRoute selectedServiceRoute) async {
+  Future<bool> openServiceRoutePage(TransferRoute selectedServiceRoute) async {
     return navigator.pushServiceRoute(context, selectedServiceRoute);
   }
 
-  Widget buildBody(List<ServiceRoute> serviceRoutes) {
+  Widget buildBody(List<TransferRoute> routes) {
     return ListView.separated(
       separatorBuilder: (context, index) => IndentDivider(),
       itemBuilder: (context, index) {
-        var route = serviceRoutes[index];
+        var route = routes[index];
         return Card(
           elevation: 0,
           child: ListTile(
-            onTap: () => onTabRoute(context, route),
+            onTap: route.completed ? null : () => onTabRoute(context, route),
             leading: Icon(
               AppIcons.mapMarkerOutline,
-              color: appTheme.colors.primary,
+              color: route.completed ? appTheme.colors.font : appTheme.colors.primary,
             ),
-            title: Text(route.description),
-            subtitle: Text('Lorem ipsum dolor sit amet',
+            title: Text(route.accountDescription),
+            subtitle: Text('${route.lineDescription}\n${ValueFormat.dateTimeToString(route.transferDate)}',
                 style: appTheme.textStyles.subtitle.copyWith(color: appTheme.colors.fontPale)),
             trailing: Icon(
               AppIcons.chevronRight,
@@ -95,7 +95,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ),
         );
       },
-      itemCount: serviceRoutes.length,
+      itemCount: routes.length,
     );
   }
 }
@@ -173,7 +173,7 @@ class _MainDrawer extends StatelessWidget {
 
     drawerItems.add(ListTile(
       leading: Icon(AppIcons.menuRight, color: appTheme.colors.primary),
-      title: Text(AppString.deservedRights, style: appTheme.textStyles.subtitleBold),
+      title: Text(AppString.completedTransfers, style: appTheme.textStyles.subtitleBold),
       onTap: () async {
         await navigator.pushDeservedRights(context);
       },

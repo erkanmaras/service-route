@@ -1,16 +1,16 @@
 import 'package:aff/infrastructure.dart';
  
 class ApplicationSettings {
-  ApplicationSettings({this.useLiteMap});
+  ApplicationSettings({this.mapPointCheckRateInSeconds});
 
   factory ApplicationSettings.fromJson(Map<String, dynamic> json) => ApplicationSettings(
-        useLiteMap: json.getValue<String>('useLiteMap'),
+        mapPointCheckRateInSeconds: json.getValue<String>('mapPointCheckRateInSeconds'),
       );
 
-  final String useLiteMap;
+  final String mapPointCheckRateInSeconds;
 
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'useLiteMap': useLiteMap,
+        'mapPointCheckRateInSeconds': mapPointCheckRateInSeconds,
       };
 }

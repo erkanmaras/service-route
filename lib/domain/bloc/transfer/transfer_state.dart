@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locator/locator.dart';
 
-class RouteState {
-  RouteState({this.locating, this.location, this.zoom, this.markers});
-  factory RouteState.initial() {
-    return RouteState(
+class TransferState {
+  TransferState({this.locating, this.location, this.zoom, this.markers});
+  factory TransferState.initial() {
+    return TransferState(
       location: Location(latitude: 39.453553, longitude: 33.957929),
       zoom: 5,
       markers: {},
@@ -18,13 +18,13 @@ class RouteState {
   final double zoom;
   final Set<Marker> markers;
 
-  RouteState copyWith({
+  TransferState copyWith({
     bool locating,
     Location location,
     double zoom,
     Set<Marker> markers,
   }) {
-    return RouteState(
+    return TransferState(
       locating: locating ?? this.locating,
       location: location ?? this.location,
       zoom: zoom ?? this.zoom,
@@ -35,8 +35,8 @@ class RouteState {
   LatLng get latLng => LatLng(location.latitude, location.longitude);
 }
 
-class RouteFailState extends RouteState {
-  RouteFailState({@required this.reason, RouteState state})
+class TransferFailState extends TransferState {
+  TransferFailState({@required this.reason, TransferState state})
       : super(
           location: state.location,
           zoom: state.zoom,

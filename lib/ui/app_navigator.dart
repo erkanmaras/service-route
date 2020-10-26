@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:service_route/data/data.dart';
-import 'package:service_route/ui/pages/deserved_rights_page.dart';
+import 'package:service_route/ui/pages/completed_transfers_page.dart';
 import 'package:service_route/ui/pages/upload_document_page.dart';
 import 'package:service_route/ui/pages/documents_page.dart';
 import 'package:service_route/ui/pages/home_page.dart';
 import 'package:service_route/ui/pages/login_page.dart';
-import 'package:service_route/ui/pages/route_page.dart';
+import 'package:service_route/ui/pages/transfer_page.dart';
 import 'package:service_route/ui/pages/theme_test_page.dart';
 
 class AppNavigator {
@@ -22,14 +22,14 @@ class AppNavigator {
         .pushAndRemoveUntil(MaterialPageRoute<void>(builder: (context) => LoginPage()), (route) => false);
   }
 
-  Future<void> pushAndRemoveUntilHome(BuildContext context, List<ServiceRoute> serviceRoutes) {
+  Future<void> pushAndRemoveUntilHome(BuildContext context, List<TransferRoute> serviceRoutes) {
     return Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute<void>(builder: (context) => HomePage(serviceRoutes: serviceRoutes)), (route) => false);
   }
 
-  Future<bool> pushServiceRoute(BuildContext context, ServiceRoute serviceRoute) {
+  Future<bool> pushServiceRoute(BuildContext context, TransferRoute serviceRoute) {
     return Navigator.of(context)
-        .push(MaterialPageRoute<bool>(builder: (context) => RoutePage(serviceRoute: serviceRoute)));
+        .push(MaterialPageRoute<bool>(builder: (context) => TransferPage(serviceRoute: serviceRoute)));
   }
 
   Future<void> pushDocuments(BuildContext context) {
@@ -39,17 +39,17 @@ class AppNavigator {
     );
   }
 
-  Future<void> pushDocumentUpload(BuildContext context,ServiceDocument serviceDocument) {
+  Future<void> pushDocumentUpload(BuildContext context,DocumentCategory serviceDocument) {
     return Navigator.push(
       context,
-      MaterialPageRoute<void>(builder: (context) => UploadDocumentPage(serviceDocument :serviceDocument)),
+      MaterialPageRoute<void>(builder: (context) => UploadDocumentPage(documentCategory :serviceDocument)),
     );
   }
 
     Future<void> pushDeservedRights(BuildContext context) {
     return Navigator.push(
       context,
-      MaterialPageRoute<void>(builder: (context) => DeservedRightsPage()),
+      MaterialPageRoute<void>(builder: (context) => CompletedTransfersPage()),
     );
   }
 
