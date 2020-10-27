@@ -11,8 +11,8 @@ import 'package:service_route/ui/pages/theme_test_page.dart';
 class AppNavigator {
   //
   //  *Fonksiyon isimleri NavigatorMetodName+PageName(Page son eki olmadan)
-  //   formatında olmalı.
-  //   pushHome ,popLogin ...
+  //  formatında olmalı.
+  //  pushHome ,popLogin ...
   //  *Fonsiyonların dönüş değeri navigator dan dönen future olmalı. (Future<void> bile olsa).
 
   static final key = GlobalKey<NavigatorState>();
@@ -27,7 +27,7 @@ class AppNavigator {
         MaterialPageRoute<void>(builder: (context) => HomePage(serviceRoutes: serviceRoutes)), (route) => false);
   }
 
-  Future<bool> pushServiceRoute(BuildContext context, TransferRoute serviceRoute) {
+  Future<bool> pushTransfer(BuildContext context, TransferRoute serviceRoute) {
     return Navigator.of(context)
         .push(MaterialPageRoute<bool>(builder: (context) => TransferPage(serviceRoute: serviceRoute)));
   }
@@ -39,14 +39,14 @@ class AppNavigator {
     );
   }
 
-  Future<void> pushDocumentUpload(BuildContext context,DocumentCategory serviceDocument) {
+  Future<void> pushUploadDocument(BuildContext context, DocumentCategory serviceDocument) {
     return Navigator.push(
       context,
-      MaterialPageRoute<void>(builder: (context) => UploadDocumentPage(documentCategory :serviceDocument)),
+      MaterialPageRoute<void>(builder: (context) => UploadDocumentPage(documentCategory: serviceDocument)),
     );
   }
 
-    Future<void> pushDeservedRights(BuildContext context) {
+  Future<void> pushCompletedTransfers(BuildContext context) {
     return Navigator.push(
       context,
       MaterialPageRoute<void>(builder: (context) => CompletedTransfersPage()),

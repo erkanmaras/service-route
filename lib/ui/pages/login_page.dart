@@ -237,12 +237,19 @@ class _LoginBodyState extends State<_LoginBody> {
   final fnPassword = FocusNode();
   final userCredentialFormKey = GlobalKey<FormState>();
 
-  bool isPasswordVisible = false;
+  bool hidePassword = true;
   List<TransferRoute> serviceRoutes;
   IServiceRouteRepository serviceRouteRepository;
   ISettingsRepository settingsRepository;
   AppNavigator navigator;
   AppContext appContext;
+
+  @override
+  void initState() {
+    tecUserName.text = appContext.settings.user?.userName ?? '';
+    super.initState();
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -279,11 +286,11 @@ class _LoginBodyState extends State<_LoginBody> {
               controller: tecPassword,
               textInputAction: TextInputAction.done,
               inputFormatters: [LengthLimitingTextInputFormatter(30)],
-              obscureText: isPasswordVisible,
-              suffixIcon: isPasswordVisible ? AppIcons.eye : AppIcons.eyeOff,
+              obscureText: hidePassword,
+              suffixIcon: hidePassword ? AppIcons.eye : AppIcons.eyeOff,
               onTabSuffixIcon: () {
                 setState(() {
-                  isPasswordVisible = !isPasswordVisible;
+                  hidePassword = !hidePassword;
                 });
               },
             ),

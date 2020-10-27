@@ -6,7 +6,8 @@ abstract class IServiceRouteRepository {
   Future<ApplicationSettings> getApplicationSettings();
   Future<List<TransferRoute>> getTransferRoutes();
   List<DocumentCategory> getServiceDocumentCategories();
-  Future<List<CompletedTransfer>> getCompletedTransfers();
+  Future<List<CompletedTransfer>> getCompletedTransfers(int year, int mont);
   Future<void> uploadTransferFile(File file);
-  Future<void> uploadServiceDocumentFile(File file);
+  Future<void> ediDocuments(DocumentCategory documentCategory, String serverFilePath, String fileName);
+  Future<String> uploadServiceDocumentFile(DocumentFile file);
 }

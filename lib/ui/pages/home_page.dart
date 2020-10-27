@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Future<bool> openServiceRoutePage(TransferRoute selectedServiceRoute) async {
-    return navigator.pushServiceRoute(context, selectedServiceRoute);
+    return navigator.pushTransfer(context, selectedServiceRoute);
   }
 
   Widget buildBody(List<TransferRoute> routes) {
@@ -77,21 +77,25 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       separatorBuilder: (context, index) => IndentDivider(),
       itemBuilder: (context, index) {
         var route = routes[index];
+        var leadingIcon = route.completed ? AppIcons.mapMarkerCheckOutline : AppIcons.mapMarkerOutline;
+        var leadingIconColor = route.completed ? appTheme.colors.success : appTheme.colors.primary;
         return Card(
           elevation: 0,
           child: ListTile(
             onTap: route.completed ? null : () => onTabRoute(context, route),
             leading: Icon(
-              AppIcons.mapMarkerOutline,
-              color: route.completed ? appTheme.colors.font : appTheme.colors.primary,
+              leadingIcon,
+              color: leadingIconColor,
             ),
             title: Text(route.accountDescription),
             subtitle: Text('${route.lineDescription}\n${ValueFormat.dateTimeToString(route.transferDate)}',
-                style: appTheme.textStyles.subtitle.copyWith(color: appTheme.colors.fontPale)),
-            trailing: Icon(
-              AppIcons.chevronRight,
-              color: appTheme.colors.primary,
-            ),
+                style: appTheme.textStyles.body.copyWith(color: appTheme.colors.fontPale)),
+            trailing: route.completed
+                ? null
+                : Icon(
+                    AppIcons.chevronRight,
+                    color: appTheme.colors.primary,
+                  ),
           ),
         );
       },
@@ -175,7 +179,7 @@ class _MainDrawer extends StatelessWidget {
       leading: Icon(AppIcons.menuRight, color: appTheme.colors.primary),
       title: Text(AppString.completedTransfers, style: appTheme.textStyles.subtitleBold),
       onTap: () async {
-        await navigator.pushDeservedRights(context);
+        await navigator.pushCompletedTransfers(context);
       },
     ));
 
@@ -185,6 +189,7 @@ class _MainDrawer extends StatelessWidget {
       leading: Icon(AppIcons.menuRight, color: appTheme.colors.primary),
       title: Text(AppString.documents, style: appTheme.textStyles.subtitleBold),
       onTap: () async {
+        navigator.pop(context);
         await navigator.pushDocuments(context);
       },
     ));

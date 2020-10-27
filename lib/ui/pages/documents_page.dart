@@ -67,6 +67,6 @@ class _DocumentsPageState extends State<DocumentsPage> {
   }
 
   void onTabRoute(DocumentCategory documentCategory) {
-    appNavigator.pushDocumentUpload(context, documentCategory);
+    appNavigator.pushUploadDocument(context, documentCategory);
   }
 }

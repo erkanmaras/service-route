@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
+import 'package:service_route/data/data.dart';
 
 class UploadDocumentState {
   UploadDocumentState({this.pickedFile, List<DocumentFileUploadStatus> uploadHistory}) {
@@ -12,17 +12,17 @@ class UploadDocumentState {
  
 }
 
-class UploadDocumentFailState extends UploadDocumentState {
-  UploadDocumentFailState({@required this.reason, UploadDocumentState state})
+class UploadDocumentSuccess extends UploadDocumentState {
+  UploadDocumentSuccess({DocumentFile pickedFile, List<DocumentFileUploadStatus> uploadHistory})
+      : super(pickedFile: pickedFile, uploadHistory: uploadHistory);
+}
+
+
+class UploadDocumentFail extends UploadDocumentState {
+  UploadDocumentFail({@required this.reason, UploadDocumentState state})
       : super(pickedFile: state.pickedFile, uploadHistory: state.uploadHistory);
 
   final String reason;
-}
-
-class DocumentFile {
-  DocumentFile(this.path) : fileName = basename(path);
-  final String path;
-  final String fileName;
 }
 
 class DocumentFileUploadStatus {

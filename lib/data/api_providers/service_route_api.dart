@@ -4,8 +4,10 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:service_route/data/data.dart';
+import 'package:service_route/data/models/document_edit.dart';
 import 'package:service_route/infrastructure/infrastructure.dart';
 import 'package:aff/infrastructure.dart';
+import 'package:path/path.dart' as path;
 
 class ServiceRouteApi {
   ServiceRouteApi(this.appContext, this.logger);
@@ -75,10 +77,12 @@ class ServiceRouteApi {
     }
   }
 
-  Future<List<CompletedTransfer>> getCompletedTransfers() async {
+  Future<List<CompletedTransfer>> getCompletedTransfers(int year, int mont) async {
     try {
+      var queryParameters = <String, dynamic>{'year': year, 'month': mont};
       final response = await dio.get<String>(
-        'deserved-right',
+        'monthly-transfer',
+        queryParameters: queryParameters,
         options: _requestOptions,
       );
       final list = await jsonDecodeAsync(response.data) as List<dynamic>;
@@ -95,15 +99,32 @@ class ServiceRouteApi {
     FormData formData = FormData.fromMap(<String, MultipartFile>{
       'file': await MultipartFile.fromFile(file.path, filename: fileName),
     });
-    await dio.post<dynamic>('upload-route', data: formData);
+    await dio.post<dynamic>('transfer', data: formData, options: _requestOptions);
   }
 
-  Future<void> uploadServiceDocumentFile(File file) async {
-    String fileName = file.path.split('/').last;
+  Future<void> ediDocuments(DocumentCategory documentCategory, String serverFilePath, String fileName) async {
+    var edit = DocumentEdit(filesToAdd: <FilesToAdd>[
+      FilesToAdd(
+        category: documentCategory.id,
+        name: fileName,
+        path: serverFilePath,
+      )
+    ]);
+    var data = edit.toJson();
+    await dio.post<String>('documents', data: data, options: _requestOptions);
+  }
+
+  Future<String> uploadServiceDocumentFile(DocumentFile file) async {
+    String fileName = path.basename(file.filePath);
     FormData formData = FormData.fromMap(<String, MultipartFile>{
-      'file': await MultipartFile.fromFile(file.path, filename: fileName),
+      'file': await MultipartFile.fromFile(file.filePath, filename: fileName),
     });
-    await dio.post<dynamic>('upload-file', data: formData);
+
+    var response = await dio.post<String>('upload-file', data: formData, options: _requestOptions);
+    if (response.data.isNullOrWhiteSpace()) {
+      throw AppException(message: AppString.documentUploadFail);
+    }
+    return response.data;
   }
 
   static dynamic _jsonDecodeCallback(String data) => json.decode(data);
@@ -146,31 +167,11 @@ class ApiException extends AppException {
   ApiException({String code, String message}) : super(code: code, message: message);
 
   factory ApiException.fromResponse(Response<dynamic> response) {
-    var responseMessage = '';
-    try {
-      var errorModel = ErrorModel.fromJson(json.decode(response.data as String) as Map<String, dynamic>);
-      switch (errorModel.type) {
-        case 'error:sql':
-          //bu case de error model de --detail-- alanı dolu.
-          //translate edilmeyen sql hataları için unExpectedErrorOccurred yerine
-          //başka bir mesaj düşünülebilir mi?
-          responseMessage = _ApiStringToAppString.convert(
-            errorModel.detail,
-            defaultValue: AppString.anUnExpectedErrorOccurred,
-          );
-          break;
-        case 'login-failed':
-          //bu case de error model de  --reasonDescription--  alanı dolu.
-          //default value verilmedi, çünkü reasondescription translate edilmemiş
-          //ise de kullanıcıya göstermek unExpectedErrorOccurred dan daha mantıklı
-          responseMessage = _ApiStringToAppString.convert(errorModel.reasonDescription);
-          break;
-        default:
-          responseMessage = AppString.anUnExpectedErrorOccurred;
-      }
-    } catch (e) {
-      responseMessage = AppString.anUnExpectedErrorOccurred;
+    var responseMessage = AppString.anUnExpectedErrorOccurred;
+    if (response.statusCode == 401) {
+      responseMessage = AppString.authenticationFailed;
     }
+
     return ApiException(message: responseMessage);
   }
 
@@ -202,16 +203,5 @@ class ApiException extends AppException {
     }
 
     return ApiException(message: AppString.anUnExpectedErrorOccurred);
-  }
-}
-
-class _ApiStringToAppString {
-  static Map<String, String> _map = {
-    'InvalidUsernameOrPassword': AppString.invalidUsernameOrPassword,
-    'Unknown': AppString.authenticationFailed,
-  };
-
-  static String convert(String apiString, {String defaultValue}) {
-    return _map.containsKey(apiString) ? _map[apiString] : defaultValue ?? apiString;
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locator/locator.dart';
 import 'package:service_route/data/data.dart';
@@ -52,7 +53,8 @@ class _TransferPageState extends State<TransferPage> {
     return MultiBlocProvider(
       providers: [
         BlocProvider<TransferBloc>(
-          create: (BuildContext context) => TransferBloc(repository: repository, logger: logger),
+          create: (BuildContext context) =>
+              TransferBloc(transferRouteId: widget.serviceRoute.id, repository: repository, logger: logger),
         ),
       ],
       child: BlocConsumer<TransferBloc, TransferState>(listener: (context, state) {
@@ -111,6 +113,7 @@ class _TransferPageState extends State<TransferPage> {
                         myLocationEnabled: true,
                         myLocationButtonEnabled: true,
                         markers: state.markers,
+                        polylines: state.polylines,
                         onMapCreated: onMapCreated,
                       ),
                       buildActionButtons(context, state)
@@ -213,26 +216,87 @@ class _TransferPageState extends State<TransferPage> {
       var bloc = context.getBloc<TransferBloc>();
 
       if (await bloc.fileExist()) {
-        await WaitDialog.scope(
-          waitMessage: AppString.transferFileUploading,
-          context: context,
-          call: (_) async => bloc.uploadFile(),
-        );
-        appNavigator.pop(context, result: true);
+        if (await checkInternetConnection()) {
+          await MessageDialog.error(context: context, message: AppString.checkInternetConnectionAndTryAgain);
+          return;
+        }
+
+        var uploaded = await WaitDialog.scope(
+            waitMessage: AppString.transferFileUploading,
+            context: context,
+            call: (_) async {
+              try {
+                await bloc.uploadFile();
+                return true;
+              } catch (e, s) {
+                logger.error(e, stackTrace: s);
+                return false;
+              }
+            });
+
+        if (!uploaded) {
+          var exit = await askQuestion(context);
+          if (exit) {
+            appNavigator.pop(context, result: uploaded);
+          }
+        }
       }
     }
+  }
+
+  Future<bool> checkInternetConnection() {
+    return Future.value(true);
+  }
+
+  Future<bool> askQuestion(BuildContext context) {
+    AlertDialog alert = AlertDialog(
+      title: Text('Hata'),
+      content: Text(AppString.transferFileCannotUpload),
+      actions: [
+        FlatButton(
+          onPressed: () {
+            Navigator.of(context).pop(false);
+          },
+          child: Text('Çıkış'),
+        ),
+        FlatButton(
+          onPressed: () {},
+          child: Text('Tekrar Dene'),
+        ),
+      ],
+    );
+
+    // show the dialog
+    return showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   Future<void> onNewPassenger(
     BuildContext context,
   ) async {
     Location newLocation = await Locator.getLastLocation();
-    var pointNameResult = await TextInputDialog.show(context, AppString.passengerName);
-    String pointName = '';
-    if (pointNameResult != null || pointNameResult.dialogResult == DialogResult.ok) {
-      pointName = pointNameResult.value;
+    var passengerNameResult = await getPassengerName(context, AppString.passengerName);
+    String passengerName = '';
+    if (passengerNameResult != null || passengerNameResult.dialogResult == DialogResult.ok) {
+      passengerName = passengerNameResult.value;
     }
-    await context.getBloc<TransferBloc>().addPointLocation(newLocation, pointName);
+    await context.getBloc<TransferBloc>().addPointLocation(newLocation, passengerName);
+  }
+
+  Future<ValueDialogResult<String>> getPassengerName(BuildContext context, String titleText) async {
+    return showDialog<ValueDialogResult<String>>(
+      context: context,
+      builder: (context) {
+        return TextInputDialog(
+          inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]'))],
+          title: Text(titleText),
+        );
+      },
+    );
   }
 
   Widget buildButton({

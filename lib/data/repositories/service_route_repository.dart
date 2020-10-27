@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:service_route/data/data.dart';
 import 'package:service_route/domain/domain.dart';
 
@@ -15,10 +14,8 @@ class ServiceRouteRepository extends IServiceRouteRepository {
 
   @override
   Future<ApplicationSettings> getApplicationSettings() async {
- 
-    return apiClient.getApplicationSettings( );
+    return apiClient.getApplicationSettings();
   }
-
 
   @override
   Future<List<TransferRoute>> getTransferRoutes() {
@@ -26,10 +23,10 @@ class ServiceRouteRepository extends IServiceRouteRepository {
   }
 
   @override
-  Future<List<CompletedTransfer>> getCompletedTransfers() {
-    return apiClient.getCompletedTransfers();
+  Future<List<CompletedTransfer>> getCompletedTransfers(int year, int mont) {
+    return apiClient.getCompletedTransfers(year,mont);
   }
- 
+
   @override
   List<DocumentCategory> getServiceDocumentCategories() {
     var documentTypes = <DocumentCategory>[];
@@ -63,7 +60,12 @@ class ServiceRouteRepository extends IServiceRouteRepository {
   }
 
   @override
-  Future<void> uploadServiceDocumentFile(File file) {
-    return apiClient.uploadTransferFile(file);
+  Future<String> uploadServiceDocumentFile(DocumentFile file) {
+    return apiClient.uploadServiceDocumentFile(file);
+  }
+
+  @override
+  Future<void> ediDocuments(DocumentCategory documentCategory, String serverFilePath, String fileName) {
+    return apiClient.ediDocuments(documentCategory, serverFilePath, fileName);
   }
 }

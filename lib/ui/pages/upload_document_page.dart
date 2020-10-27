@@ -35,18 +35,17 @@ class _UploadDocumentPage extends State<UploadDocumentPage> {
     return MultiBlocProvider(
         providers: [
           BlocProvider<UploadDocumentBloc>(
-            create: (BuildContext context) => UploadDocumentBloc(repository: repository, logger: logger),
+            create: (BuildContext context) => UploadDocumentBloc(
+              documentCategory: widget.documentCategory,
+              repository: repository,
+              logger: logger,
+            ),
           ),
         ],
-        child: BlocConsumer<UploadDocumentBloc, UploadDocumentState>(listener: (context, state) {
-          if (state is UploadDocumentFailState) {
-            SnackBarAlert.error(context: context, message: state.reason);
-            return;
-          }
-        }, builder: (context, state) {
+        child: BlocBuilder<UploadDocumentBloc, UploadDocumentState>(builder: (context, state) {
           Widget image;
           if (state.hasFile) {
-            image = Image.file(File(state.pickedFile.path));
+            image = Image.file(File(state.pickedFile.filePath));
           } else {
             image = Center(
                 child: Icon(
@@ -72,7 +71,6 @@ class _UploadDocumentPage extends State<UploadDocumentPage> {
                               context: context,
                               call: (_) async => context.getBloc<UploadDocumentBloc>().uploadSelectedDocument(),
                             );
-                            SnackBarAlert.info(context: context, message: AppString.documentUploadComplete);
                           }
                         },
                         label: Text(AppString.upload),
@@ -81,59 +79,71 @@ class _UploadDocumentPage extends State<UploadDocumentPage> {
                         )),
                   )
                 : null,
-            body: ContentContainer(
-              child: ScrollConfiguration(
-                behavior: RemoveEffectScrollBehavior(),
-                child: CustomScrollView(
-                  slivers: [
-                    SliverFillRemaining(
-                      hasScrollBody: false,
-                      child: Column(
-                        children: [
-                          CardTitle(
-                            title: widget.documentCategory.name,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 2),
-                            child: Column(
-                              children: [
-                                Container(
-                                  margin: EdgeInsets.symmetric(horizontal: 2),
-                                  decoration: BoxDecoration(
-                                      color: appTheme.colors.canvas,
-                                      border: Border.all(color: appTheme.colors.canvasDark)),
-                                  height: 200,
-                                  width: double.infinity,
-                                  child: image,
-                                ),
-                                ExpandedRow(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(10),
-                                      child: ElevatedButton(
-                                          onPressed: () async {
-                                            await pickImageFromGallery(context);
-                                          },
-                                          child: Text(AppString.pickImageFromGallery)),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(10),
-                                      child: ElevatedButton(
-                                          onPressed: () async {
-                                            await pickImageFromCamera(context);
-                                          },
-                                          child: Text(AppString.pickImageFromCamera)),
-                                    )
-                                  ],
-                                ),
-                              ],
+            body: BlocListener<UploadDocumentBloc, UploadDocumentState>(
+              listener: (context, state) {
+                if (state is UploadDocumentFail) {
+                  SnackBarAlert.error(context: context, message: state.reason);
+                  return;
+                }
+                if (state is UploadDocumentSuccess) {
+                  SnackBarAlert.info(context: context, message: AppString.documentUploadComplete);
+                  return;
+                }
+              },
+              child: ContentContainer(
+                child: ScrollConfiguration(
+                  behavior: RemoveEffectScrollBehavior(),
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Column(
+                          children: [
+                            CardTitle(
+                              title: widget.documentCategory.name,
                             ),
-                          ),
-                          _UploadedFiles(state.uploadHistory)
-                        ],
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 2),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    margin: EdgeInsets.symmetric(horizontal: 2),
+                                    decoration: BoxDecoration(
+                                        color: appTheme.colors.canvas,
+                                        border: Border.all(color: appTheme.colors.canvasDark)),
+                                    height: 200,
+                                    width: double.infinity,
+                                    child: image,
+                                  ),
+                                  ExpandedRow(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: ElevatedButton(
+                                            onPressed: () async {
+                                              await pickImageFromGallery(context);
+                                            },
+                                            child: Text(AppString.pickImageFromGallery)),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: ElevatedButton(
+                                            onPressed: () async {
+                                              await pickImageFromCamera(context);
+                                            },
+                                            child: Text(AppString.pickImageFromCamera)),
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            _UploadedFiles(state.uploadHistory)
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -219,7 +229,7 @@ class _UploadedFiles extends StatelessWidget {
                 ),
                 Expanded(
                   child: Text(
-                    item.file.fileName,
+                    item.file.prettyFileName,
                     overflow: TextOverflow.ellipsis,
                     style: appTheme.textStyles.body,
                   ),
