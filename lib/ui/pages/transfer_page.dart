@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -21,12 +22,14 @@ class _TransferPageState extends State<TransferPage> {
   _TransferPageState()
       : logger = AppService.get<Logger>(),
         repository = AppService.get<IServiceRouteRepository>(),
-        appNavigator = AppService.get<AppNavigator>();
+        appNavigator = AppService.get<AppNavigator>(),
+        appContext = AppService.get<AppContext>();
 
   GoogleMapController mapController;
   bool keepScreenOn = false;
   AppTheme appTheme;
   AppNavigator appNavigator;
+  AppContext appContext;
   Logger logger;
   IServiceRouteRepository repository;
 
@@ -128,6 +131,10 @@ class _TransferPageState extends State<TransferPage> {
     );
   }
 
+  int get mapUpdateIntervalInSecond {
+    return math.max(appContext.settings.app.mapPointCheckRateInSeconds, 1);
+  }
+
   Widget buildActionButtons(BuildContext context, TransferState state) {
     if (state.locating) {
       return buildTrackingAction(context);
@@ -195,79 +202,88 @@ class _TransferPageState extends State<TransferPage> {
     });
 
     await Locator.start(
-      notificationTitle: AppString.locationInfoCollecting,
-      notificationText: AppString.lastLocation,
-      updateIntervalInSecond: 10,
-    );
+        notificationTitle: AppString.locationInfoCollecting,
+        notificationText: AppString.lastLocation,
+        updateIntervalInSecond: mapUpdateIntervalInSecond);
 
     await context.getBloc<TransferBloc>().startLocating();
   }
 
-  Future<void> onStop(
-    BuildContext context,
-  ) async {
-    var result = await MessageSheet.question(
-      context: context,
-      message: AppString.areYouSureWantToCompleteTransfer,
-      buttons: DialogButton.yesNo,
-    );
-    if (result == DialogResult.yes) {
+  Future<void> onStop(BuildContext context) async {
+    if (Locator.locating) {
+      var dialogResult = await MessageSheet.question(
+        context: context,
+        message: AppString.areYouSureWantToCompleteTransfer,
+        buttons: DialogButton.yesNo,
+      );
+
+      if (dialogResult == DialogResult.no) {
+        return;
+      }
       await Locator.stop();
-      var bloc = context.getBloc<TransferBloc>();
+    }
 
-      if (await bloc.fileExist()) {
-        if (await checkInternetConnection()) {
-          await MessageDialog.error(context: context, message: AppString.checkInternetConnectionAndTryAgain);
-          return;
-        }
+    var bloc = context.getBloc<TransferBloc>();
 
-        var uploaded = await WaitDialog.scope(
-            waitMessage: AppString.transferFileUploading,
-            context: context,
-            call: (_) async {
-              try {
-                await bloc.uploadFile();
-                return true;
-              } catch (e, s) {
-                logger.error(e, stackTrace: s);
-                return false;
-              }
-            });
+    if (!await bloc.fileExist()) {
+      //no file no upload
+      appNavigator.pop(context, result: false);
+    }
 
-        if (!uploaded) {
-          var exit = await askQuestion(context);
-          if (exit) {
-            appNavigator.pop(context, result: uploaded);
+    if (!await internetConnectionExist()) {
+      await MessageDialog.error(context: context, message: AppString.checkInternetConnectionAndTryAgain);
+      return;
+    }
+
+    var uploaded = await WaitDialog.scope(
+        waitMessage: AppString.transferFileUploading,
+        context: context,
+        call: (_) async {
+          try {
+            await bloc.uploadFile();
+            return true;
+          } catch (e, s) {
+            logger.error(e, stackTrace: s);
+            return false;
           }
-        }
+        });
+
+    if (uploaded) {
+      appNavigator.pop(context, result: true);
+    } else {
+      var retryResult = await askRetryQuestion(context);
+      if (retryResult == DialogResult.no) {
+        appNavigator.pop(context, result: uploaded);
       }
     }
   }
 
-  Future<bool> checkInternetConnection() {
-    return Future.value(true);
+  Future<bool> internetConnectionExist() {
+    return Connectivity.checkInternetConnection();
   }
 
-  Future<bool> askQuestion(BuildContext context) {
+  Future<DialogResult> askRetryQuestion(BuildContext context) {
     AlertDialog alert = AlertDialog(
-      title: Text('Hata'),
+      title: Text(AppString.error),
       content: Text(AppString.transferFileCannotUpload),
       actions: [
-        FlatButton(
-          onPressed: () {
-            Navigator.of(context).pop(false);
-          },
-          child: Text('Çıkış'),
-        ),
-        FlatButton(
-          onPressed: () {},
-          child: Text('Tekrar Dene'),
-        ),
+        TextButton(
+            style: TextButton.styleFrom(primary: appTheme.colors.error),
+            onPressed: () {
+              Navigator.pop(context, DialogResult.no);
+            },
+            child: Text(AppString.exit, style: appTheme.textStyles.subtitleBold)),
+        TextButton(
+            style: TextButton.styleFrom(primary: appTheme.colors.primary),
+            onPressed: () {
+              Navigator.pop(context, DialogResult.yes);
+            },
+            child: Text(AppString.retry, style: appTheme.textStyles.subtitleBold)),
       ],
     );
 
     // show the dialog
-    return showDialog<bool>(
+    return showDialog<DialogResult>(
       context: context,
       builder: (BuildContext context) {
         return alert;

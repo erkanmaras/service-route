@@ -20,9 +20,12 @@ class TransferBloc extends Cubit<TransferState> {
 
   final Logger logger;
   final IServiceRouteRepository repository;
-  final double transferRouteId;
+  final int transferRouteId;
   TransferFile transferFile;
-  int maxLocationErrorCount = 3;
+
+  //sentry kotasını doldurmamak için maks 3 hata yı log a yaz.
+  int locationErrorLogRight = 3;
+  int pointErrorLogRight = 3;
 
   Future<void> addPointLocation(Location location, String pointName) async {
     return _addMarker(
@@ -43,20 +46,14 @@ class TransferBloc extends Cubit<TransferState> {
   }) async {
     try {
       var markers = state.markers;
-      markers.add(Marker(
-          markerId: MarkerId(location.latitude.toString()),
-          position: LatLng(location.latitude, location.longitude),
-          icon: BitmapDescriptor.defaultMarker,
-          infoWindow: InfoWindow(
-            title: name ?? AppString.passenger,
-          )));
-      await _writeToFile(LocationType.point, location, name);
+      markers.add(createMarker(location, name));
+      await writeToFile(LocationType.point, location, name);
       emit(state.copyWith(locating: true, location: location, markers: markers, zoom: 16));
     } catch (e, s) {
-      maxLocationErrorCount -= 1;
+      pointErrorLogRight -= 1;
       emit(TransferFailState(reason: AppString.anUnExpectedErrorOccurred, state: state));
       //throttle error , keep sentry quota
-      if (maxLocationErrorCount > 0) {
+      if (pointErrorLogRight > 0) {
         logger.error(e, stackTrace: s);
       }
     }
@@ -66,20 +63,8 @@ class TransferBloc extends Cubit<TransferState> {
     Location location,
   }) async {
     try {
-      List<LatLng> points;
-      var oldPolyline = state.polylines.firstOrDefault();
-      if (oldPolyline != null) {
-        points = oldPolyline.points.toList();
-      } else {
-        points = <LatLng>[];
-      }
-      points.add(LatLng(location.latitude, location.longitude));
-      var polyline = Polyline(
-        polylineId: PolylineId(location.latitude.toString()),
-        points: points,
-        color: Colors.blue,
-      );
-      await _writeToFile(LocationType.route, location, '');
+      var polyline = createPolyLine(location);
+      await writeToFile(LocationType.route, location, '');
       emit(state.copyWith(
         locating: true,
         location: location,
@@ -88,13 +73,13 @@ class TransferBloc extends Cubit<TransferState> {
         zoom: 16,
       ));
     } catch (e, s) {
-      maxLocationErrorCount -= 1;
+      locationErrorLogRight -= 1;
       emit(TransferFailState(
         reason: AppString.anUnExpectedErrorOccurred,
         state: state,
       ));
       //throttle error , keep sentry quota
-      if (maxLocationErrorCount > 0) {
+      if (locationErrorLogRight > 0) {
         logger.error(e, stackTrace: s);
       }
     }
@@ -113,19 +98,23 @@ class TransferBloc extends Cubit<TransferState> {
     }
   }
 
-  void stopLocating() {
+  Future<void> stopLocating() async {
+    await writeToFile(LocationType.point, state.location, AppString.endPoint);
     emit(TransferState.initial());
   }
 
-  Future<void> _writeToFile(
+  Future<void> writeToFile(
     LocationType locationType,
     Location location,
     String name,
   ) async {
-    var line = _RouteFileEntry(
-            locationType: locationType, latitude: location.latitude, longitude: location.longitude, name: name)
-        .toString();
-    await transferFile.writeAsString(line);
+    var entry = TransferFileEntry(
+      locationType: locationType,
+      latitude: location.latitude,
+      longitude: location.longitude,
+      name: name,
+    );
+    await transferFile.writeAsString(entry);
   }
 
   Future<void> deleteFile() async {
@@ -145,6 +134,39 @@ class TransferBloc extends Cubit<TransferState> {
     logger.debug(fileContent);
     await repository.uploadTransferFile(await transferFile.getFile());
   }
+
+  Marker createMarker(Location location, String name) {
+    return Marker(
+        markerId: MarkerId(location.latitude.toString()),
+        position: LatLng(location.latitude, location.longitude),
+        icon: BitmapDescriptor.defaultMarker,
+        infoWindow: name == null
+            ? null
+            : InfoWindow(
+                title: name,
+              ));
+  }
+
+  Polyline createPolyLine(Location location) {
+    List<LatLng> points;
+    var oldPolyline = state.polylines.firstOrDefault();
+    if (oldPolyline != null) {
+      points = oldPolyline.points.toList();
+    } else {
+      points = <LatLng>[];
+    }
+
+    points.add(LatLng(
+      location.latitude,
+      location.longitude,
+    ));
+
+    return Polyline(
+      polylineId: PolylineId(location.latitude.toString()),
+      points: points,
+      color: Colors.blue.shade400,
+    );
+  }
 }
 
 enum LocationType { route, point }
@@ -152,9 +174,24 @@ enum LocationType { route, point }
 class TransferFile {
   TransferFile(this.fileName);
   String fileName;
-  Future<void> writeAsString(String log) async {
+  bool emptyFile;
+
+  Future<void> writeAsString(TransferFileEntry entry) async {
     final file = await getFile();
-    await file.writeAsString(log, mode: FileMode.append);
+    //ilk lokasyon bilgisi , başlangıç noktasını belirtmek için point olarak
+    // kayıt ediliyor.
+    if (emptyFile) {
+      await file.writeAsString(
+          TransferFileEntry(
+            locationType: LocationType.point,
+            latitude: entry.latitude,
+            longitude: entry.longitude,
+            name: AppString.startPoint,
+          ).toString(),
+          mode: FileMode.append);
+      emptyFile = false;
+    }
+    await file.writeAsString(entry.toString(), mode: FileMode.append);
   }
 
   Future<bool> fileExists() async {
@@ -168,6 +205,7 @@ class TransferFile {
     final file = File(path);
     if (!file.existsSync()) {
       await file.writeAsString('');
+      emptyFile = true;
     }
     return file;
   }
@@ -188,8 +226,8 @@ class TransferFile {
   }
 }
 
-class _RouteFileEntry {
-  _RouteFileEntry({
+class TransferFileEntry {
+  TransferFileEntry({
     this.locationType,
     this.latitude,
     this.longitude,
@@ -199,10 +237,7 @@ class _RouteFileEntry {
   @override
   String toString() {
     var line = StringBuffer();
-    line.write(locationType.index);
-    line.write(',$latitude');
-    line.write(',$longitude');
-
+    line.write('${locationType.index},$latitude,$longitude');
     if (locationType.index == LocationType.point.index) {
       line.write(',"${name ?? ""}",${Clock().now().toIso8601String()}');
     }

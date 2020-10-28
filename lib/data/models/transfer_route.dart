@@ -10,14 +10,14 @@ class TransferRoute {
   });
 
   factory TransferRoute.fromJson(Map<String, dynamic> json) => TransferRoute(
-        id: json.getValue<double>('id'),
+        id: json.getValue<int>('id'),
         completed: json.getValue<bool>('completed'),
         transferDate: json.getValue<DateTime>('transferDate'),
         lineDescription: json.getValue<String>('lineDescription'),
         accountDescription: json.getValue<String>('accountDescription'),
       );
 
-  final double id;
+  final int id;
   final bool completed;
   final DateTime transferDate;
   final String lineDescription;

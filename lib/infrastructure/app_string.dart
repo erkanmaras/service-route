@@ -1,10 +1,14 @@
 class AppString {
   static const String appName = 'Servis Rotası';
   static const String start = 'Başla';
+  static const String startPoint = 'Başlangıç Noktası';
+  static const String endPoint = 'Bitiş Noktası';
   static const String ok = 'Tamam';
   static const String error = 'Hata';
   static const String done = 'Bitir';
   static const String logout = 'Çıkış';
+    static const String exit = 'Çıkış';
+  static const String retry = 'Tekrar Dene';
   static const String passenger = 'Yolcu';
   static const String takePassenger = 'Yolcu Al';
   static const String passengerName = 'Yolcu Adı';
@@ -20,7 +24,7 @@ class AppString {
   static const String apiConnectionTimeout = 'İşlem zaman aşımına uğradı!';
   static const String apiRequestCanceled = 'İşlem iptal edildi!';
   static const String areYouSureWantToCompleteTransfer = 'Transfer tamamlanacak! Devam etmek istiyormusunuz?';
-  static const String transferFileCannotUpload = 'Transfer bilgileri gönderilemedi! İşlemi bitirmek istiyormusunuz ?';
+  static const String transferFileCannotUpload = 'Transfer bilgileri gönderilemedi!';
   static const String keepScreenOn = 'Ekran Açık';
   static const String loginForm = 'Kullanıcı Girişi';
   static const String userName = 'Kullanıcı Adı';

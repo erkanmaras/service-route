@@ -23,10 +23,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final AppContext appContext;
   IServiceRouteRepository iserviceRouteRepository;
   AppTheme appTheme;
-  Future<List<TransferRoute>> serviceRoutes;
+  Future<List<TransferRoute>> transferRoutesFuture;
+  List<TransferRoute> transferRoutes;
   @override
   void initState() {
-    serviceRoutes = iserviceRouteRepository.getTransferRoutes();
+    transferRoutesFuture = iserviceRouteRepository.getTransferRoutes();
     super.initState();
   }
 
@@ -45,7 +46,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         drawer: _MainDrawer(),
         body: ContentContainer(
             child: FutureBuilder<List<TransferRoute>>(
-                future: serviceRoutes,
+                future: transferRoutesFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return BackgroundHint.loading(context, AppString.loading);
@@ -55,7 +56,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     } else if (!snapshot.hasData || snapshot.data.isNullOrEmpty()) {
                       return BackgroundHint.noData(context);
                     } else {
-                      return buildBody(snapshot.data);
+                      transferRoutes = snapshot.data;
+                      return buildBody();
                     }
                   }
                 })));
@@ -72,35 +74,44 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return navigator.pushTransfer(context, selectedServiceRoute);
   }
 
-  Widget buildBody(List<TransferRoute> routes) {
-    return ListView.separated(
-      separatorBuilder: (context, index) => IndentDivider(),
-      itemBuilder: (context, index) {
-        var route = routes[index];
-        var leadingIcon = route.completed ? AppIcons.mapMarkerCheckOutline : AppIcons.mapMarkerOutline;
-        var leadingIconColor = route.completed ? appTheme.colors.success : appTheme.colors.primary;
-        return Card(
-          elevation: 0,
-          child: ListTile(
-            onTap: route.completed ? null : () => onTabRoute(context, route),
-            leading: Icon(
-              leadingIcon,
-              color: leadingIconColor,
-            ),
-            title: Text(route.accountDescription),
-            subtitle: Text('${route.lineDescription}\n${ValueFormat.dateTimeToString(route.transferDate)}',
-                style: appTheme.textStyles.body.copyWith(color: appTheme.colors.fontPale)),
-            trailing: route.completed
-                ? null
-                : Icon(
-                    AppIcons.chevronRight,
-                    color: appTheme.colors.primary,
-                  ),
-          ),
-        );
-      },
-      itemCount: routes.length,
-    );
+  Widget buildBody() {
+    return RefreshIndicator(
+        color: appTheme.colors.canvasLight,
+        backgroundColor: appTheme.colors.primary,
+        onRefresh: () async {
+          var transferRoutes = await iserviceRouteRepository.getTransferRoutes();
+          if (mounted) {
+            setState(() => this.transferRoutes = transferRoutes);
+          }
+        },
+        child: ListView.separated(
+          separatorBuilder: (context, index) => IndentDivider(),
+          itemBuilder: (context, index) {
+            var route = transferRoutes[index];
+            var leadingIcon = route.completed ? AppIcons.mapMarkerCheckOutline : AppIcons.mapMarkerOutline;
+            var leadingIconColor = route.completed ? appTheme.colors.success : appTheme.colors.primary;
+            return Card(
+              elevation: 0,
+              child: ListTile(
+                onTap: route.completed ? null : () => onTabRoute(context, route),
+                leading: Icon(
+                  leadingIcon,
+                  color: leadingIconColor,
+                ),
+                title: Text(route.accountDescription),
+                subtitle: Text('${route.lineDescription}\n${ValueFormat.dateTimeToString(route.transferDate)}',
+                    style: appTheme.textStyles.body.copyWith(color: appTheme.colors.fontPale)),
+                trailing: route.completed
+                    ? null
+                    : Icon(
+                        AppIcons.chevronRight,
+                        color: appTheme.colors.primary,
+                      ),
+              ),
+            );
+          },
+          itemCount: transferRoutes.length,
+        ));
   }
 }
 
@@ -179,6 +190,7 @@ class _MainDrawer extends StatelessWidget {
       leading: Icon(AppIcons.menuRight, color: appTheme.colors.primary),
       title: Text(AppString.completedTransfers, style: appTheme.textStyles.subtitleBold),
       onTap: () async {
+        navigator.pop(context);
         await navigator.pushCompletedTransfers(context);
       },
     ));
@@ -194,9 +206,8 @@ class _MainDrawer extends StatelessWidget {
       },
     ));
 
-    drawerItems.add(IndentDivider());
-
     if (!kReleaseMode) {
+      drawerItems.add(IndentDivider());
       drawerItems.add(ListTile(
         leading: Icon(AppIcons.menuRight, color: appTheme.colors.primary),
         title: Text('Theme Showcase', style: appTheme.textStyles.subtitleBold),
