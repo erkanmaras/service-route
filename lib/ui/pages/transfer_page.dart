@@ -26,20 +26,25 @@ class _TransferPageState extends State<TransferPage> {
         appContext = AppService.get<AppContext>();
 
   GoogleMapController mapController;
-  bool keepScreenOn = false;
+  bool screenLocked = false;
   AppTheme appTheme;
   AppNavigator appNavigator;
   AppContext appContext;
   Logger logger;
   IServiceRouteRepository repository;
-
+  Future<void> wakelockFuture;
   @override
   void initState() {
+    wakelockFuture = Wakelock.toggle(enable: true);
     super.initState();
   }
 
   @override
   void dispose() {
+    if (screenLocked) {
+      Wakelock.toggle(enable: false);
+    }
+
     Locator.stop();
     mapController?.dispose();
     super.dispose();
@@ -77,18 +82,23 @@ class _TransferPageState extends State<TransferPage> {
               Row(
                 children: [
                   Text(AppString.keepScreenOn),
-                  StatefulBuilder(
-                    builder: (context, setState) => Switch(
-                      inactiveTrackColor: appTheme.colors.canvasDark,
-                      value: keepScreenOn,
-                      onChanged: (value) {
-                        setState(() {
-                          keepScreenOn = value;
-                          Wakelock.toggle(enable: keepScreenOn);
-                        });
-                      },
-                    ),
-                  ),
+                  FutureBuilder<Object>(
+                      future: wakelockFuture,
+                      builder: (context, snapshot) {
+                        screenLocked = snapshot.connectionState == ConnectionState.done && !snapshot.hasError;
+                        return StatefulBuilder(
+                          builder: (context, setState) => Switch(
+                            inactiveTrackColor: appTheme.colors.canvasDark,
+                            value: screenLocked,
+                            onChanged: (value) {
+                              setState(() {
+                                screenLocked = value;
+                                Wakelock.toggle(enable: screenLocked);
+                              });
+                            },
+                          ),
+                        );
+                      }),
                 ],
               )
             ],
