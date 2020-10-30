@@ -41,10 +41,7 @@ class _TransferPageState extends State<TransferPage> {
 
   @override
   void dispose() {
-    if (screenLocked) {
-      Wakelock.toggle(enable: false);
-    }
-
+    Wakelock.toggle(enable: false);
     mapController?.dispose();
     super.dispose();
   }

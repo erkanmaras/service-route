@@ -28,24 +28,28 @@ class FakeDataInterceptor extends InterceptorsWrapper {
       return dio.resolve<String>(FakeData.login());
     }
 
-    if (options.path.contains('service-route')) {
-      return dio.resolve<String>(FakeData.serviceRoutes());
+    if (options.path.contains('config')) {
+      return dio.resolve<String>(FakeData.config());
     }
 
-    if (options.path.contains('deserved-right')) {
-      return dio.resolve<String>(FakeData.deservedRights());
+    if (options.path.contains('transfer')) {
+      if(options.method.equalsIgnoreCase('put'))
+      {
+        return dio.resolve<String>(FakeData.transfer());
+      }
+      return dio.resolve<String>(FakeData.transfer());
     }
 
-    if (options.path.contains('service-document')) {
-      return dio.resolve<String>(FakeData.serviceDocuments());
+    if (options.path.contains('monthly-transfer')) {
+      return dio.resolve<String>(FakeData.monthlyTransfer());
     }
 
     if (options.path.contains('upload-route')) {
       return dio.resolve<bool>(true);
     }
 
-        if (options.path.contains('upload-file')) {
-      return dio.resolve<bool>(true);
+    if (options.path.contains('upload-file')) {
+      return dio.resolve<String>('filePath');
     }
     throw AppError(message: 'FakeData class not configured for this path:${options.path}');
   }
