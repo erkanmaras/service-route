@@ -2,7 +2,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:locator/locator.dart';
 import 'package:service_route/data/data.dart';
 import 'package:service_route/domain/domain.dart';
 import 'package:service_route/infrastructure/app_permission.dart';
@@ -33,6 +32,7 @@ class _TransferPageState extends State<TransferPage> {
   Logger logger;
   IServiceRouteRepository repository;
   Future<void> wakelockFuture;
+
   @override
   void initState() {
     wakelockFuture = Wakelock.toggle(enable: true);
@@ -45,7 +45,6 @@ class _TransferPageState extends State<TransferPage> {
       Wakelock.toggle(enable: false);
     }
 
-    Locator.stop();
     mapController?.dispose();
     super.dispose();
   }
@@ -207,20 +206,13 @@ class _TransferPageState extends State<TransferPage> {
       return;
     }
 
-    Locator.getLocations((newLocation) {
-      context.getBloc<TransferBloc>().addRouteLocation(newLocation);
-    });
-
-    await Locator.start(
-        notificationTitle: AppString.locationInfoCollecting,
-        notificationText: AppString.lastLocation,
-        updateIntervalInSecond: mapUpdateIntervalInSecond);
-
-    await context.getBloc<TransferBloc>().startLocating();
+    await context.getBloc<TransferBloc>().startLocating(mapUpdateIntervalInSecond);
   }
 
   Future<void> onStop(BuildContext context) async {
-    if (Locator.locating) {
+    var bloc = context.getBloc<TransferBloc>();
+
+    if (bloc.locating) {
       var dialogResult = await MessageSheet.question(
         context: context,
         message: AppString.areYouSureWantToCompleteTransfer,
@@ -230,10 +222,9 @@ class _TransferPageState extends State<TransferPage> {
       if (dialogResult == DialogResult.no) {
         return;
       }
-      await Locator.stop();
-    }
 
-    var bloc = context.getBloc<TransferBloc>();
+      await bloc.stopLocating();
+    }
 
     if (!await bloc.fileExist()) {
       //no file no upload
@@ -278,13 +269,14 @@ class _TransferPageState extends State<TransferPage> {
       content: Text(AppString.transferFileCannotUpload),
       actions: [
         TextButton(
-            style: TextButton.styleFrom(primary: appTheme.colors.error),
+            // style: TextButton.styleFrom(primary: appTheme.colors.error),
             onPressed: () {
               Navigator.pop(context, DialogResult.no);
             },
-            child: Text(AppString.exit, style: appTheme.textStyles.subtitleBold)),
+            child:
+                Text(AppString.exit, style: appTheme.textStyles.subtitleBold.copyWith(color: appTheme.colors.error))),
         TextButton(
-            style: TextButton.styleFrom(primary: appTheme.colors.primary),
+            //    style: TextButton.styleFrom(primary: appTheme.colors.primary),
             onPressed: () {
               Navigator.pop(context, DialogResult.yes);
             },
@@ -304,13 +296,12 @@ class _TransferPageState extends State<TransferPage> {
   Future<void> onNewPassenger(
     BuildContext context,
   ) async {
-    Location newLocation = await Locator.getLastLocation();
     var passengerNameResult = await getPassengerName(context, AppString.passengerName);
     String passengerName = '';
     if (passengerNameResult != null || passengerNameResult.dialogResult == DialogResult.ok) {
       passengerName = passengerNameResult.value;
     }
-    await context.getBloc<TransferBloc>().addPointLocation(newLocation, passengerName);
+    await context.getBloc<TransferBloc>().addPointLocation(passengerName);
   }
 
   Future<ValueDialogResult<String>> getPassengerName(BuildContext context, String titleText) async {
@@ -318,7 +309,7 @@ class _TransferPageState extends State<TransferPage> {
       context: context,
       builder: (context) {
         return TextInputDialog(
-          inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]'))],
+          inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[\\w\\s]'))],
           title: Text(titleText),
         );
       },

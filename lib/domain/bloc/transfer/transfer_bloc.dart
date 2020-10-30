@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locator/locator.dart';
@@ -27,7 +28,8 @@ class TransferBloc extends Cubit<TransferState> {
   int locationErrorLogRight = 3;
   int pointErrorLogRight = 3;
 
-  Future<void> addPointLocation(Location location, String pointName) async {
+  Future<void> addPointLocation(String pointName) async {
+    Location location = await Locator.getLastLocation();
     return _addMarker(
       location: location,
       name: pointName,
@@ -85,8 +87,19 @@ class TransferBloc extends Cubit<TransferState> {
     }
   }
 
-  Future<void> startLocating() async {
+  bool get locating {
+    return Locator.locating;
+  }
+
+  Future<void> startLocating(int mapUpdateIntervalInSecond) async {
     try {
+      Locator.getLocations(addRouteLocation);
+
+      await Locator.start(
+          notificationTitle: AppString.locationInfoCollecting,
+          notificationText: AppString.lastLocation,
+          updateIntervalInSecond: mapUpdateIntervalInSecond);
+
       await deleteFile();
       emit(state.copyWith(locating: true));
     } on AppException catch (e, s) {
@@ -99,7 +112,16 @@ class TransferBloc extends Cubit<TransferState> {
   }
 
   Future<void> stopLocating() async {
-    await writeToFile(LocationType.point, state.location, AppString.endPoint);
+    try {
+      //stop never throw ex
+      await Locator.stop();
+      await writeToFile(LocationType.point, state.location, AppString.endPoint);
+    } catch (e, s) {
+      logger.error(e, stackTrace: s);
+    }
+  }
+
+  Future<void> resetState() async {
     emit(TransferState.initial());
   }
 
@@ -130,8 +152,11 @@ class TransferBloc extends Cubit<TransferState> {
   }
 
   Future<void> uploadFile() async {
-    var fileContent = await transferFile.readAsString();
-    logger.debug(fileContent);
+    if (!kReleaseMode) {
+      var fileContent = await transferFile.readAsString();
+      logger.debug(fileContent);
+    }
+
     await repository.uploadTransferFile(await transferFile.getFile());
   }
 
@@ -162,10 +187,17 @@ class TransferBloc extends Cubit<TransferState> {
     ));
 
     return Polyline(
-      polylineId: PolylineId(location.latitude.toString()),
-      points: points,
-      color: Colors.blue.shade400,
-    );
+        polylineId: PolylineId('transfer_polyline'),
+        points: points,
+        color: Colors.blue.shade400,
+        startCap: Cap.buttCap,
+        endCap: Cap.roundCap);
+  }
+
+  @override
+  Future<void> close() {
+    Locator.stop();
+    return super.close();
   }
 }
 
