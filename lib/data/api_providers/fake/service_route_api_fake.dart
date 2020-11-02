@@ -33,9 +33,8 @@ class FakeDataInterceptor extends InterceptorsWrapper {
     }
 
     if (options.path.contains('transfer')) {
-      if(options.method.equalsIgnoreCase('put'))
-      {
-        return dio.resolve<String>(FakeData.transfer());
+      if (options.method.equalsIgnoreCase('put')) {
+        return dio.resolve<String>(FakeData.uploadTransferFile());
       }
       return dio.resolve<String>(FakeData.transfer());
     }
@@ -44,13 +43,14 @@ class FakeDataInterceptor extends InterceptorsWrapper {
       return dio.resolve<String>(FakeData.monthlyTransfer());
     }
 
-    if (options.path.contains('upload-route')) {
-      return dio.resolve<bool>(true);
+    if (options.path.contains('upload-file')) {
+      return dio.resolve<String>(FakeData.uploadFile());
     }
 
-    if (options.path.contains('upload-file')) {
-      return dio.resolve<String>('filePath');
+    if (options.path.contains('documents')) {
+      return dio.resolve<String>(FakeData.documents());
     }
+
     throw AppError(message: 'FakeData class not configured for this path:${options.path}');
   }
 }
