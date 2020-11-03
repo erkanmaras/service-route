@@ -56,6 +56,6 @@ class AppString {
   static const String transferTime = 'Geçen Süre';
   static const String transferDistance = 'Alınan Mesafe';
   static const String transferPassenger = 'Alınan Yolcu';
-  static const String transferFileReading = 'Transfer bilgileri okunuyor...';
+  static const String transferSummaryCalculating = 'Transfer özeti hesaplanıyor...';
   static const String transferFileCannotRead = 'Transfer özeti oluşturulamadı!';
 }

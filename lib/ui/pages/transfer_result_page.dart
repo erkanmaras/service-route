@@ -57,7 +57,7 @@ class _TransferResultPageState extends State<TransferResultPage> {
               builder: (context, state) {
                 return Builder(builder: (context) {
                   if (state is TransferResultReading) {
-                    return BackgroundHint.loading(context, AppString.loading);
+                    return BackgroundHint.loading(context, AppString.transferSummaryCalculating);
                   }
 
                   if (state is TransferResultReadComplete) {
