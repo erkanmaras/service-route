@@ -28,8 +28,8 @@ class TransferBloc extends Cubit<TransferState> {
   int locationErrorLogRight = 3;
   int pointErrorLogRight = 3;
 
-  Future<void> addPointLocation(String pointName) async {
-    Location location = await Locator.getLastLocation();
+  Future<void> addPointLocation(Location location,String pointName) async {
+    
     return _addMarker(
       location: location,
       name: pointName,

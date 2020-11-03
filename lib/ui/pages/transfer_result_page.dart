@@ -57,18 +57,14 @@ class _TransferResultPageState extends State<TransferResultPage> {
               builder: (context, state) {
                 return Builder(builder: (context) {
                   if (state is TransferResultReading) {
-                    return BackgroundHint.loading(context, AppString.transferFileReading);
-                  }
-
-                  if (state is TransferResultReadFail) {
-                    return BackgroundHint.unExpectedError(context);
+                    return BackgroundHint.loading(context, AppString.loading);
                   }
 
                   if (state is TransferResultReadComplete) {
                     return buildData(state.summary);
                   }
 
-                  return BackgroundHint.recordNotFound(context);
+                  return buildError();
                 });
               },
             )),
@@ -107,14 +103,32 @@ class _TransferResultPageState extends State<TransferResultPage> {
         SizedBox(
           height: kMinInteractiveDimension,
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 10),
-          child: ElevatedButton(
-              onPressed: () {
-                appNavigator.pushAndRemoveUntilHome(context);
-              },
-              child: Text(AppString.ok)),
+        buildOKButton(appTheme)
+      ],
+    );
+  }
+
+  Widget buildError() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Icon(
+          AppIcons.emoticonSadOutline,
+          size: kMinInteractiveDimension,
         ),
+        SizedBox(
+          height: kMinInteractiveDimension,
+        ),
+        Text(
+          AppString.transferFileCannotRead,
+          style: appTheme.textStyles.title,
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(
+          height: kMinInteractiveDimension,
+        ),
+        buildOKButton(appTheme)
       ],
     );
   }
@@ -131,6 +145,17 @@ class _TransferResultPageState extends State<TransferResultPage> {
           Text(value, overflow: TextOverflow.ellipsis, style: appTheme.textStyles.title)
         ],
       ),
+    );
+  }
+
+  Widget buildOKButton(AppTheme appTheme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 10),
+      child: ElevatedButton(
+          onPressed: () {
+            appNavigator.pushAndRemoveUntilHome(context);
+          },
+          child: Text(AppString.ok)),
     );
   }
 }

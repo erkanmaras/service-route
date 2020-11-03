@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:locator/locator.dart';
 import 'package:service_route/data/data.dart';
 import 'package:service_route/domain/domain.dart';
 import 'package:service_route/infrastructure/app_permission.dart';
@@ -246,7 +246,7 @@ class _TransferPageState extends State<TransferPage> {
         });
 
     if (fileContent != null) {
-      await appNavigator.pushTransferResult(context,  fileContent);
+      await appNavigator.pushTransferResult(context, fileContent);
     } else {
       var retryResult = await askRetryQuestion(context);
       if (retryResult == DialogResult.no) {
@@ -289,15 +289,14 @@ class _TransferPageState extends State<TransferPage> {
     );
   }
 
-  Future<void> onNewPassenger(
-    BuildContext context,
-  ) async {
+  Future<void> onNewPassenger(BuildContext context) async {
+    Location location = await Locator.getLastLocation();
     var passengerNameResult = await getPassengerName(context, AppString.passengerName);
     String passengerName = '';
     if (passengerNameResult != null || passengerNameResult.dialogResult == DialogResult.ok) {
       passengerName = passengerNameResult.value;
     }
-    await context.getBloc<TransferBloc>().addPointLocation(passengerName);
+    await context.getBloc<TransferBloc>().addPointLocation(location, passengerName);
   }
 
   Future<ValueDialogResult<String>> getPassengerName(BuildContext context, String titleText) async {
@@ -305,7 +304,7 @@ class _TransferPageState extends State<TransferPage> {
       context: context,
       builder: (context) {
         return TextInputDialog(
-          inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[\\w\\s]'))],
+          //  inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[\\w\\sğüşöçİĞÜŞÖÇ]'))],
           title: Text(titleText),
         );
       },

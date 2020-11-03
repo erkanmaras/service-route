@@ -13,10 +13,6 @@ class TransferResultReadComplete extends TransferResultState {
   final TransferSummary summary;
 }
 
-class TransferResultInitial extends TransferResultState {
-  TransferResultInitial();
-}
-
 class TransferResultReading extends TransferResultState {
   TransferResultReading();
 }
@@ -78,7 +74,7 @@ class TransferSummary {
     if (timeInSeconds == 0) {
       return 0;
     }
-    
+
     return timeInSeconds / 60;
   }
 

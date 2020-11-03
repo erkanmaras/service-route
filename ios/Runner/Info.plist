@@ -35,7 +35,7 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>The microphone will be used to recod audio.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>The Photo library will be used to save the document photo.</string>
+	<string>The Photo library will be used to select the document photo.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
