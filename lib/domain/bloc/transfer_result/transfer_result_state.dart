@@ -90,6 +90,6 @@ class TransferSummary {
   }
 
   String get distanceInKmsString {
-    return '${NumberFormat('###.#').format(distanceInKms)} km';
+    return '≈ ${NumberFormat('###.#').format(distanceInKms)} km';
   }
 }
