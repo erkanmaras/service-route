@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:service_route/data/data.dart';
 import 'package:service_route/ui/pages/completed_transfers_page.dart';
+import 'package:service_route/ui/pages/transfer_result_page.dart';
 import 'package:service_route/ui/pages/upload_document_page.dart';
 import 'package:service_route/ui/pages/documents_page.dart';
 import 'package:service_route/ui/pages/home_page.dart';
@@ -22,14 +23,23 @@ class AppNavigator {
         .pushAndRemoveUntil(MaterialPageRoute<void>(builder: (context) => LoginPage()), (route) => false);
   }
 
-  Future<void> pushAndRemoveUntilHome(BuildContext context, List<TransferRoute> serviceRoutes) {
-    return Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute<void>(builder: (context) => HomePage(serviceRoutes: serviceRoutes)), (route) => false);
+  Future<void> pushAndRemoveUntilHome(BuildContext context) {
+    return Navigator.of(context)
+        .pushAndRemoveUntil(MaterialPageRoute<void>(builder: (context) => HomePage()), (route) => false);
+  }
+
+  void popUntilHome(BuildContext context) {
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   Future<bool> pushTransfer(BuildContext context, TransferRoute serviceRoute) {
     return Navigator.of(context)
         .push(MaterialPageRoute<bool>(builder: (context) => TransferPage(serviceRoute: serviceRoute)));
+  }
+
+  Future<bool> pushTransferResult(BuildContext context, String fileContent) {
+    return Navigator.of(context)
+        .push(MaterialPageRoute<bool>(builder: (context) => TransferResultPage(fileContent: fileContent)));
   }
 
   Future<void> pushDocuments(BuildContext context) {

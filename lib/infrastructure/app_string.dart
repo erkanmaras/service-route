@@ -7,7 +7,7 @@ class AppString {
   static const String error = 'Hata';
   static const String done = 'Bitir';
   static const String logout = 'Çıkış';
-    static const String exit = 'Çıkış';
+  static const String exit = 'Çıkış';
   static const String retry = 'Tekrar Dene';
   static const String passenger = 'Yolcu';
   static const String takePassenger = 'Yolcu Al';
@@ -34,6 +34,7 @@ class AppString {
   static const String documents = 'Dokümanlar';
   static const String documentUpload = 'Doküman Yükle';
   static const String completedTransfers = 'Tamamlanan Transferler';
+  static const String transferResult = 'Transfer Özeti';
   static const String pickImageFromGallery = 'Galeriden Seç';
   static const String pickImageFromCamera = 'Fofograf Çek';
   static const String history = 'Geçmiş';
@@ -51,4 +52,9 @@ class AppString {
   static const String loading = 'Yükleniyor';
   static const String transferFileUploading = 'Transfer bilgileri gönderiliyor...';
   static const String transferFileUploaded = 'Transfer bilgileri gönderildi.';
+
+  static const String transferTime = 'Geçen Süre';
+  static const String transferDistance = 'Alınan Mesafe';
+  static const String transferPassenger = 'Alınan Yolcu';
+  static const String transferFileReading = 'Transfer bilgileri okunuyor...';
 }

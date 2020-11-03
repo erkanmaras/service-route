@@ -238,7 +238,7 @@ class _LoginBodyState extends State<_LoginBody> {
   final userCredentialFormKey = GlobalKey<FormState>();
 
   bool hidePassword = true;
-  List<TransferRoute> serviceRoutes;
+
   IServiceRouteRepository serviceRouteRepository;
   ISettingsRepository settingsRepository;
   AppNavigator navigator;
@@ -320,13 +320,10 @@ class _LoginBodyState extends State<_LoginBody> {
                           startProcessing();
 
                           var bloc = context.getBloc<AuthenticationBloc>();
-                          await bloc.authentication(
-                              AuthenticationModel(
-                                userName: tecUserName.text,
-                                password: tecPassword.text,
-                              ), onSuccess: () async {
-                            serviceRoutes = await serviceRouteRepository.getTransferRoutes();
-                          });
+                          await bloc.authentication(AuthenticationModel(
+                            userName: tecUserName.text,
+                            password: tecPassword.text,
+                          ));
                         } finally {
                           stopProcessing();
                         }
@@ -347,7 +344,7 @@ class _LoginBodyState extends State<_LoginBody> {
   }
 
   Future<void> onLoginSuccess() async {
-    await navigator.pushAndRemoveUntilHome(context, serviceRoutes);
+    await navigator.pushAndRemoveUntilHome(context);
   }
 }
 

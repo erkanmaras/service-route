@@ -233,25 +233,24 @@ class _TransferPageState extends State<TransferPage> {
       return;
     }
 
-    var uploaded = await WaitDialog.scope(
+    var fileContent = await WaitDialog.scope(
         waitMessage: AppString.transferFileUploading,
         context: context,
         call: (_) async {
           try {
-            await bloc.uploadFile();
-            return true;
+            return await bloc.uploadFile();
           } catch (e, s) {
             logger.error(e, stackTrace: s);
-            return false;
+            return null;
           }
         });
 
-    if (uploaded) {
-      appNavigator.pop(context, result: true);
+    if (fileContent != null) {
+      await appNavigator.pushTransferResult(context,  fileContent);
     } else {
       var retryResult = await askRetryQuestion(context);
       if (retryResult == DialogResult.no) {
-        appNavigator.pop(context, result: uploaded);
+        appNavigator.pop(context, result: false);
       }
     }
   }

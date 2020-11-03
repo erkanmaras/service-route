@@ -94,12 +94,14 @@ class ServiceRouteApi {
     }
   }
 
-  Future<void> uploadTransferFile(File file) async {
+  Future<String> uploadTransferFile(File file) async {
     String fileName = path.basename(file.path);
+    String fileContent = await file.readAsString();
     FormData formData = FormData.fromMap(<String, MultipartFile>{
-      'file': await MultipartFile.fromFile(file.path, filename: fileName),
+      'file': MultipartFile.fromString(fileContent, filename: fileName),
     });
     await dio.put<dynamic>('transfer', data: formData, options: _requestOptions);
+    return fileContent;
   }
 
   Future<void> ediDocuments(DocumentCategory documentCategory, String serverFilePath, String fileName) async {

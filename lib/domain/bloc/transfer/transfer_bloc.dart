@@ -151,13 +151,14 @@ class TransferBloc extends Cubit<TransferState> {
     return transferFile.getFile();
   }
 
-  Future<void> uploadFile() async {
+  Future<String> uploadFile() async {
     if (!kReleaseMode) {
       var fileContent = await transferFile.readAsString();
       logger.debug(fileContent);
     }
 
-    await repository.uploadTransferFile(await transferFile.getFile());
+    File file = await transferFile.getFile();
+    return repository.uploadTransferFile(file);
   }
 
   Marker createMarker(Location location, String name) {

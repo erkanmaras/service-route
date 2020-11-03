@@ -6,9 +6,7 @@ import 'package:service_route/infrastructure/infrastructure.dart';
 import 'package:service_route/ui/ui.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key key, this.serviceRoutes}) : super(key: key);
-
-  final List<TransferRoute> serviceRoutes;
+  HomePage();
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -64,14 +62,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Future<void> onTabRoute(BuildContext context, TransferRoute selectedServiceRoute) async {
-    var result = await openServiceRoutePage(selectedServiceRoute);
-    if (result != null && result == true) {
-      SnackBarAlert.info(context: context, message: AppString.transferFileUploaded);
-    }
-  }
-
-  Future<bool> openServiceRoutePage(TransferRoute selectedServiceRoute) async {
-    return navigator.pushTransfer(context, selectedServiceRoute);
+    await navigator.pushTransfer(context, selectedServiceRoute);
   }
 
   Widget buildBody() {
