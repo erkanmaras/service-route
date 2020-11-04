@@ -46,18 +46,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             child: FutureBuilder<List<TransferRoute>>(
                 future: transferRoutesFuture,
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return BackgroundHint.loading(context, AppString.loading);
-                  } else {
+                  if (snapshot.connectionState == ConnectionState.done) {
                     if (snapshot.hasError) {
                       return BackgroundHint.unExpectedError(context);
-                    } else if (!snapshot.hasData || snapshot.data.isNullOrEmpty()) {
-                      return BackgroundHint.noData(context);
-                    } else {
-                      transferRoutes = snapshot.data;
-                      return buildBody();
                     }
+
+                    if (!snapshot.hasData || snapshot.data.isNullOrEmpty()) {
+                      return BackgroundHint.noData(context);
+                    }
+
+                    transferRoutes = snapshot.data;
+                    return buildBody();
                   }
+                  return BackgroundHint.loading(context, AppString.loading);
                 })));
   }
 

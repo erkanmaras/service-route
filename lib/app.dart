@@ -76,7 +76,8 @@ class App {
   }
 
   Future<void> reportError(AppErrorReport appError) async {
-    await ErrorReporter.sendErrorReport(appError);
+     // ignore: unawaited_futures
+      ErrorReporter.sendErrorReport(appError) ;
   }
 
   Future<void> initializeUserSettings() async {

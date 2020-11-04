@@ -28,8 +28,7 @@ class TransferBloc extends Cubit<TransferState> {
   int locationErrorLogRight = 3;
   int pointErrorLogRight = 3;
 
-  Future<void> addPointLocation(Location location,String pointName) async {
-    
+  Future<void> addPointLocation(Location location, String pointName) async {
     return _addMarker(
       location: location,
       name: pointName,
@@ -48,6 +47,7 @@ class TransferBloc extends Cubit<TransferState> {
   }) async {
     try {
       var markers = state.markers;
+      name = name.isNullOrWhiteSpace() ? '${AppString.passenger} ${markers.length + 1}' : name;
       markers.add(createMarker(location, name));
       await writeToFile(LocationType.point, location, name);
       emit(state.copyWith(locating: true, location: location, markers: markers, zoom: 16));
