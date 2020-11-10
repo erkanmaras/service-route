@@ -207,7 +207,7 @@ enum LocationType { route, point }
 class TransferFile {
   TransferFile(this.fileName);
   String fileName;
-  bool emptyFile;
+  bool emptyFile = false;
 
   Future<void> writeAsString(TransferFileEntry entry) async {
     final file = await getFile();
