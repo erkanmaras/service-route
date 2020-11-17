@@ -7,4 +7,4 @@ export 'error/error_message.dart';
 export 'error/error_reporter.dart';
 export 'package:aff/infrastructure.dart';
 export 'package:clock/clock.dart';
-export 'package:flutter_bloc/flutter_bloc.dart' hide BlocProviderExtension;
+export 'package:flutter_bloc/flutter_bloc.dart' hide ReadContext, SelectContext, WatchContext;
