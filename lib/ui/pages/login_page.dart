@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:service_route/data/data.dart';
@@ -68,14 +67,14 @@ class _LoginPageState extends State<LoginPage> {
                           hasScrollBody: false,
                           child: Column(
                             children: [
-                              _LoginHeader(),
-                              SizedBox(
-                                height: 10,
-                              ),
                               Expanded(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
+                                    _LoginHeader(),
+                                    SizedBox(
+                                      height: mediaQuery.size.longestSidePercent(10),
+                                    ),
                                     _LoginBody(),
                                   ],
                                 ),
@@ -142,78 +141,21 @@ class _LoginHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appTheme = context.getTheme();
-    return Container(
-      height: 180,
-      child: Stack(
-        children: <Widget>[
-          ClipPath(
-            clipper: _HeaderClipper(
-              yLine: 170,
-              y1Bezier: 190,
-              y2bezier: 54,
-            ),
-            child: Container(
-              color: appTheme.colors.canvas,
-            ),
+    return Column(
+      children: [
+        Image.asset(
+          AppImage.logo,
+          fit: BoxFit.fitHeight,
+          height: context.getMediaQuery().size.longestSidePercent(20),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: Text(
+            AppString.appName,
+            style: appTheme.data.textTheme.headline5.copyWith(fontWeight: FontWeight.bold),
           ),
-          // ClipPath(
-          //   clipper: _HeaderClipper(
-          //     yLine: 150,
-          //     y1Bezier: 180,
-          //     y2bezier: 52,
-          //   ),
-          //   child: Container(
-          //     color: appTheme.colors.primary,
-          //   ),
-          // ),
-          ClipPath(
-            clipper: _HeaderClipper(
-              yLine: 130,
-              y1Bezier: 170,
-              y2bezier: 50,
-            ),
-            child: Container(
-              color: appTheme.colors.canvasLight,
-            ),
-          ),
-          Align(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 25),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: <Widget>[
-                      Text(
-                        AppString.appName,
-                        style: appTheme.data.textTheme.headline5.copyWith(fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        'by Özata Tur',
-                        style: appTheme.data.textTheme.bodyText1.copyWith(color: appTheme.colors.fontPale),
-                      ),
-                    ],
-                  ),
-                ),
-                Align(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 20, bottom: 30),
-                    child: Transform.rotate(
-                      angle: -pi / -4,
-                      child: Image.asset(
-                        AppImage.logo,
-                        height: 80,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -263,7 +205,15 @@ class _LoginBodyState extends State<_LoginBody> {
         padding: const EdgeInsets.symmetric(horizontal: 30),
         child: Column(
           children: <Widget>[
-            Text(AppString.loginForm, style: appTheme.textStyles.title),
+            Row(
+              children: [
+                Text(
+                  AppString.loginForm,
+                  style: appTheme.textStyles.bodyBold,
+                  textAlign: TextAlign.start,
+                ),
+              ],
+            ),
             SizedBox(height: 10),
             Divider(),
             SizedBox(height: 20),
