@@ -156,16 +156,16 @@ class _LoginHeader extends StatelessWidget {
               color: appTheme.colors.canvas,
             ),
           ),
-          ClipPath(
-            clipper: _HeaderClipper(
-              yLine: 150,
-              y1Bezier: 180,
-              y2bezier: 52,
-            ),
-            child: Container(
-              color: appTheme.colors.primary,
-            ),
-          ),
+          // ClipPath(
+          //   clipper: _HeaderClipper(
+          //     yLine: 150,
+          //     y1Bezier: 180,
+          //     y2bezier: 52,
+          //   ),
+          //   child: Container(
+          //     color: appTheme.colors.primary,
+          //   ),
+          // ),
           ClipPath(
             clipper: _HeaderClipper(
               yLine: 130,
@@ -199,13 +199,12 @@ class _LoginHeader extends StatelessWidget {
                 ),
                 Align(
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 20, bottom: 20),
+                    padding: const EdgeInsets.only(left: 20, bottom: 30),
                     child: Transform.rotate(
                       angle: -pi / -4,
-                      child: Icon(
-                        AppIcons.mapMarkerMultipleOutline,
-                        color: appTheme.colors.primary,
-                        size: 80,
+                      child: Image.asset(
+                        AppImage.logo,
+                        height: 80,
                       ),
                     ),
                   ),

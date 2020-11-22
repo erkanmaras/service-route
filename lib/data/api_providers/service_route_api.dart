@@ -27,7 +27,7 @@ class ServiceRouteApi {
 
   void initialize() {
     dio ??= Dio();
-    var baseUrl = 'http://api.servisrotasi.com/api/mobile/';
+    var baseUrl = 'https://mobil.servisrotasi.com/api/mobile/';
 
     dio.options.baseUrl = baseUrl;
     dio.options.responseType = ResponseType.json;
