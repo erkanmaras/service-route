@@ -11,9 +11,11 @@ packages:
   aff:
     dependency: "direct main"
     description:
-      path: "../aff"
-      relative: true
-    source: path
+      path: "."
+      ref: main
+      resolved-ref: "7fc94afe34f9ade1b35a08f7032c9dceea978b79"
+      url: "git://github.com/erkanmaras/aff.git"
+    source: git
     version: "0.1.1"
   analyzer:
     dependency: transitive
@@ -311,9 +313,11 @@ packages:
   locator:
     dependency: "direct main"
     description:
-      path: "../locator"
-      relative: true
-    source: path
+      path: "."
+      ref: main
+      resolved-ref: "94e3ad7d0005e933342af97dfddb1a8e766fcb23"
+      url: "git://github.com/erkanmaras/locator.git"
+    source: git
     version: "0.0.1"
   logging:
     dependency: transitive
