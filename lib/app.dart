@@ -76,8 +76,8 @@ class App {
   }
 
   Future<void> reportError(AppErrorReport appError) async {
-     // ignore: unawaited_futures
-      ErrorReporter.sendErrorReport(appError) ;
+    // ignore: unawaited_futures
+    ErrorReporter.sendErrorReport(appError);
   }
 
   Future<void> initializeUserSettings() async {
@@ -122,7 +122,7 @@ class AppWidget extends StatelessWidget {
     return MultiProvider(
       providers: [..._providers()],
       builder: (context, child) {
-        return addBetaBanner(MaterialApp(
+        return MaterialApp(
           locale: Locale('tr'),
           supportedLocales: [Locale('tr')],
           localizationsDelegates: _localizationsDelegates(),
@@ -131,7 +131,7 @@ class AppWidget extends StatelessWidget {
           navigatorKey: AppNavigator.key,
           navigatorObservers: [AppNavigator.routeObserver],
           home: LoginPage(),
-        ));
+        );
       },
     );
   }
@@ -156,16 +156,6 @@ class AppWidget extends StatelessWidget {
         create: (_) => AppTheme(),
       )
     ];
-  }
-
-  Widget addBetaBanner(Widget child) {
-    return Banner(
-      location: kReleaseMode ? BannerLocation.topEnd : BannerLocation.topStart,
-      message: 'BETA',
-      layoutDirection: TextDirection.ltr,
-      textDirection: TextDirection.ltr,
-      child: child,
-    );
   }
 }
 
