@@ -33,8 +33,6 @@
 	<string>Uygulamayı kullanabilmeniz için gereklidir.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>The camera will be used to take the document photo.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>The location information collected will be used to measure the distance traveled.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>The location information collected will be used to measure the distance traveled.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
