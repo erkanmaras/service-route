@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:locator/locator.dart';
-
+import 'package:service_route/domain/domain.dart';
+ 
 class TransferState {
   TransferState({this.locating, this.location, this.zoom, this.markers, this.polylines});
   factory TransferState.initial() {

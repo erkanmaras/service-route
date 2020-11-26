@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
 import 'package:bloc/bloc.dart';
-import 'package:service_route/domain/bloc/transfer_result/transfer_result_state.dart';
+import 'package:service_route/domain/blocs/transfer_result/transfer_result_state.dart';
 import 'package:service_route/domain/domain.dart';
 import 'package:service_route/infrastructure/infrastructure.dart';
-export 'package:service_route/domain/bloc/transfer_result/transfer_result_state.dart';
+export 'package:service_route/domain/blocs/transfer_result/transfer_result_state.dart';
 
 class TransferResultBloc extends Cubit<TransferResultState> {
   TransferResultBloc({@required this.logger})

@@ -1,10 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:locator/locator.dart';
 import 'package:service_route/data/data.dart';
 import 'package:service_route/domain/domain.dart';
-import 'package:service_route/infrastructure/app_permission.dart';
 import 'package:service_route/ui/ui.dart';
 import 'package:service_route/infrastructure/infrastructure.dart';
 import 'package:wakelock/wakelock.dart';
@@ -191,13 +189,13 @@ class _TransferPageState extends State<TransferPage> {
   }
 
   Future<void> onStart(BuildContext context) async {
-    var locationPermissionGranted = await AppPermission.locationPermissionGranted();
+    var locationPermissionGranted = await Locator.locationPermissionGranted();
     if (!locationPermissionGranted) {
       await MessageDialog.error(context: context, message: AppString.locationPermissionMustBeGranted);
       return;
     }
 
-    var locationServiceEnable = await AppPermission.locationServiceEnable();
+    var locationServiceEnable = await Locator.locationServiceEnable();
     if (!locationServiceEnable) {
       await MessageDialog.info(context: context, message: AppString.toContinueTurnOnDeviceLocation);
       return;
@@ -290,7 +288,8 @@ class _TransferPageState extends State<TransferPage> {
   }
 
   Future<void> onNewPassenger(BuildContext context) async {
-    Location location = await Locator.getLastLocation();
+    var bloc = context.getBloc<TransferBloc>();
+    Location location = await bloc.getLastLocation();
     var passengerNameResult = await getPassengerName(context, AppString.passengerName);
     String passengerName = '';
     if (passengerNameResult != null || passengerNameResult.dialogResult == DialogResult.ok) {

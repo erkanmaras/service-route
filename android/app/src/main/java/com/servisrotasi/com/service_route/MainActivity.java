@@ -1,4 +1,4 @@
-package com.servisrotasi.com.service_route;
+package com.servisrotasi.surucu;
 
 import io.flutter.embedding.android.FlutterActivity;
 

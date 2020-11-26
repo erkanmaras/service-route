@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:locator/locator.dart';
 import 'package:service_route/domain/domain.dart';
 import 'package:intl/intl.dart';
 

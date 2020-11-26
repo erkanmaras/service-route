@@ -11,11 +11,9 @@ packages:
   aff:
     dependency: "direct main"
     description:
-      path: "."
-      ref: main
-      resolved-ref: "7fc94afe34f9ade1b35a08f7032c9dceea978b79"
-      url: "git://github.com/erkanmaras/aff.git"
-    source: git
+      path: "../aff"
+      relative: true
+    source: path
     version: "0.1.1"
   analyzer:
     dependency: transitive
@@ -226,6 +224,20 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  geolocator:
+    dependency: "direct main"
+    description:
+      name: geolocator
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "6.1.8"
+  geolocator_platform_interface:
+    dependency: transitive
+    description:
+      name: geolocator_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.8"
   glob:
     dependency: transitive
     description:
@@ -310,15 +322,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.6.2"
-  locator:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: main
-      resolved-ref: "94e3ad7d0005e933342af97dfddb1a8e766fcb23"
-      url: "git://github.com/erkanmaras/locator.git"
-    source: git
-    version: "0.0.1"
   logging:
     dependency: transitive
     description:
@@ -431,20 +434,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.9.2"
-  permission_handler:
-    dependency: "direct main"
-    description:
-      name: permission_handler
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "5.0.1+1"
-  permission_handler_platform_interface:
-    dependency: transitive
-    description:
-      name: permission_handler_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.1"
   petitparser:
     dependency: transitive
     description:

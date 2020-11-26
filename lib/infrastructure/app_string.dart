@@ -42,8 +42,6 @@ class AppString {
   static const String documentUploading = 'Doküman gönderiliyor...';
   static const String documentUploadComplete = 'Doküman gönderildi!';
   static const String documentUploadFail = 'Doküman gönderilemedi! Lütfen tekrar deneyiniz.';
-  static const String locationInfoCollecting = 'Konum bilgisi alınıyor...';
-  static const String lastLocation = 'Son Konum';
   static const String toContinueTurnOnDeviceLocation =
       'Devam etmek için cihazınızın konum özelliğini açmanız gerekmektedir';
   static const String locationPermissionMustBeGranted = 'Konum servisine erişim izni vermelisiniz!';

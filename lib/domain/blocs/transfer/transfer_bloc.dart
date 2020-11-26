@@ -2,31 +2,32 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:locator/locator.dart';
 import 'package:meta/meta.dart';
 import 'package:bloc/bloc.dart';
-import 'package:service_route/domain/bloc/transfer/transfer_state.dart';
+import 'package:service_route/domain/blocs/transfer/transfer_state.dart';
 import 'package:service_route/domain/domain.dart';
 import 'package:service_route/infrastructure/infrastructure.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-export 'package:service_route/domain/bloc/transfer/transfer_state.dart';
+export 'package:service_route/domain/blocs/transfer/transfer_state.dart';
 
 class TransferBloc extends Cubit<TransferState> {
   TransferBloc({@required this.transferRouteId, @required this.repository, @required this.logger})
       : assert(logger != null),
         super(TransferState.initial()) {
     transferFile = TransferFile(transferRouteId.toString());
+    locator = Locator(logger: logger);
   }
 
   final Logger logger;
   final IServiceRouteRepository repository;
   final int transferRouteId;
   TransferFile transferFile;
+  Locator locator;
 
-  //sentry kotasını doldurmamak için maks 3 hata yı log a yaz.
-  int locationErrorLogRight = 3;
-  int pointErrorLogRight = 3;
+  //sentry kotasını doldurmamak için maks 5 hata yı log a yaz.
+  int locationErrorLogRight = 5;
+  int pointErrorLogRight = 5;
 
   Future<void> addPointLocation(Location location, String pointName) async {
     return _addMarker(
@@ -88,18 +89,19 @@ class TransferBloc extends Cubit<TransferState> {
   }
 
   bool get locating {
-    return Locator.locating;
+    return locator.locating;
+  }
+
+  Future<Location> getLastLocation() {
+    return locator.getLastLocation();
   }
 
   Future<void> startLocating(int mapUpdateIntervalInSecond) async {
     try {
-      Locator.getLocations(addRouteLocation);
-
-      await Locator.start(
-          notificationTitle: AppString.locationInfoCollecting,
-          notificationText: AppString.lastLocation,
-          updateIntervalInSecond: mapUpdateIntervalInSecond);
-
+      locationErrorLogRight = 5;
+      pointErrorLogRight = 5;
+      
+      await locator.start(callBack: addRouteLocation, updateIntervalInSecond: mapUpdateIntervalInSecond);
       await deleteFile();
       emit(state.copyWith(locating: true));
     } on AppException catch (e, s) {
@@ -114,7 +116,7 @@ class TransferBloc extends Cubit<TransferState> {
   Future<void> stopLocating() async {
     try {
       //stop never throw ex
-      await Locator.stop();
+      await locator.stop();
       await writeToFile(LocationType.point, state.location, AppString.endPoint);
     } catch (e, s) {
       logger.error(e, stackTrace: s);
@@ -197,7 +199,7 @@ class TransferBloc extends Cubit<TransferState> {
 
   @override
   Future<void> close() {
-    Locator.stop();
+    locator.stop();
     return super.close();
   }
 }

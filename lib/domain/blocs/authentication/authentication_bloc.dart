@@ -1,10 +1,10 @@
 import 'package:meta/meta.dart';
 import 'package:bloc/bloc.dart';
 import 'package:service_route/data/data.dart';
-import 'package:service_route/domain/bloc/authentication/authentication_state.dart';
+import 'package:service_route/domain/blocs/authentication/authentication_state.dart';
 import 'package:service_route/domain/domain.dart';
 import 'package:service_route/infrastructure/infrastructure.dart';
-export 'package:service_route/domain/bloc/authentication/authentication_state.dart';
+export 'package:service_route/domain/blocs/authentication/authentication_state.dart';
 
 class AuthenticationBloc extends Cubit<AuthenticationState> {
   AuthenticationBloc(

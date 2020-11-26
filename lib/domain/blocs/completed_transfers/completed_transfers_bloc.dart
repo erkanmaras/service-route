@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:meta/meta.dart';
 import 'package:bloc/bloc.dart';
-import 'package:service_route/domain/bloc/completed_transfers/completed_transfers_state.dart';
+import 'package:service_route/domain/blocs/completed_transfers/completed_transfers_state.dart';
 import 'package:service_route/domain/domain.dart';
 import 'package:service_route/infrastructure/infrastructure.dart';
-export 'package:service_route/domain/bloc/completed_transfers/completed_transfers_state.dart';
+export 'package:service_route/domain/blocs/completed_transfers/completed_transfers_state.dart';
 
 class CompletedTransfersBloc extends Cubit<CompletedTransfersState> {
   CompletedTransfersBloc({@required this.repository, @required this.logger})
