@@ -11,9 +11,11 @@ packages:
   aff:
     dependency: "direct main"
     description:
-      path: "../aff"
-      relative: true
-    source: path
+      path: "."
+      ref: main
+      resolved-ref: "995c7ee1f3657dfaafaf406a989aceba9a6d6d6b"
+      url: "git://github.com/erkanmaras/aff.git"
+    source: git
     version: "0.1.1"
   analyzer:
     dependency: transitive

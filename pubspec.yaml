@@ -22,10 +22,10 @@ dependencies:
   wakelock: ^0.2.1+1
   geolocator: ^6.1.8
   aff:
-    path: ../aff/
-    #  git:
-    #    url: git://github.com/erkanmaras/aff.git
-    #    ref: main
+    # path: ../aff/
+    git:
+      url: git://github.com/erkanmaras/aff.git
+      ref: main
 
 dev_dependencies:
   flutter_test:
