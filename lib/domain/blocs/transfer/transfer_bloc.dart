@@ -92,8 +92,8 @@ class TransferBloc extends Cubit<TransferState> {
     return locator.locating;
   }
 
-  Future<Location> getLastLocation() {
-    return locator.getLastLocation();
+  Future<Location> getCurrentPosition() {
+    return locator.getCurrentPosition();
   }
 
   Future<void> startLocating(int mapUpdateIntervalInSecond) async {

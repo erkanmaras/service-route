@@ -289,7 +289,7 @@ class _TransferPageState extends State<TransferPage> {
 
   Future<void> onNewPassenger(BuildContext context) async {
     var bloc = context.getBloc<TransferBloc>();
-    Location location = await bloc.getLastLocation();
+    Location location = await bloc.getCurrentPosition();
     var passengerNameResult = await getPassengerName(context, AppString.passengerName);
     String passengerName = '';
     if (passengerNameResult != null || passengerNameResult.dialogResult == DialogResult.ok) {

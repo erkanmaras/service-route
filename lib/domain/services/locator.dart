@@ -8,8 +8,8 @@ class Locator {
   Logger logger;
   bool locating = false;
   StreamSubscription<Position> positionStream;
-  
- //sentry kotasını doldurmamak için maks 5 hata yı log a yaz.
+
+  //sentry kotasını doldurmamak için maks 5 hata yı log a yaz.
   int locationErrorLogRight = 5;
 
   Future<void> start({
@@ -18,6 +18,8 @@ class Locator {
   }) async {
     updateIntervalInSecond ??= 10;
     locationErrorLogRight = 5;
+
+    callBack(await getCurrentPosition());
     positionStream = Geolocator.getPositionStream(
             desiredAccuracy: LocationAccuracy.bestForNavigation,
             distanceFilter: 20,
@@ -40,7 +42,7 @@ class Locator {
   }
 
   /// Get the last location once.
-  Future<Location> getLastLocation() async {
+  Future<Location> getCurrentPosition() async {
     return _toLocation(await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation));
   }
 
