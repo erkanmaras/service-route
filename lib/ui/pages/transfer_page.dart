@@ -292,7 +292,7 @@ class _TransferPageState extends State<TransferPage> {
     Location location = await bloc.getCurrentPosition();
     var passengerNameResult = await getPassengerName(context, AppString.passengerName);
     String passengerName = '';
-    if (passengerNameResult != null || passengerNameResult.dialogResult == DialogResult.ok) {
+    if (passengerNameResult != null && passengerNameResult.dialogResult == DialogResult.ok) {
       passengerName = passengerNameResult.value;
     }
     await context.getBloc<TransferBloc>().addPointLocation(location, passengerName);
