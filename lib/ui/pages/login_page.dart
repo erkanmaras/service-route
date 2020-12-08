@@ -73,7 +73,8 @@ class _LoginPageState extends State<LoginPage> {
                                   children: <Widget>[
                                     _LoginHeader(),
                                     SizedBox(
-                                      height: mediaQuery.size.longestSidePercent(10),
+                                      height: mediaQuery.size
+                                          .longestSidePercent(10),
                                     ),
                                     _LoginBody(),
                                   ],
@@ -152,7 +153,8 @@ class _LoginHeader extends StatelessWidget {
           padding: const EdgeInsets.only(top: 10),
           child: Text(
             AppString.appName,
-            style: appTheme.data.textTheme.headline5.copyWith(fontWeight: FontWeight.bold),
+            style: appTheme.data.textTheme.headline5
+                .copyWith(fontWeight: FontWeight.bold),
           ),
         ),
       ],
@@ -259,7 +261,8 @@ class _LoginBodyState extends State<_LoginBody> {
                   width: double.infinity,
                   child: ProgressButton(
                     indicatorColor: Colors.white,
-                    onPressed: (startProcessing, stopProcessing, isProcessing) async {
+                    onPressed:
+                        (startProcessing, stopProcessing, isProcessing) async {
                       if (!userCredentialFormKey.currentState.validate()) {
                         return;
                       }
@@ -280,7 +283,8 @@ class _LoginBodyState extends State<_LoginBody> {
                     },
                     child: Text(
                       AppString.login,
-                      style: appTheme.data.textTheme.headline6.copyWith(color: appTheme.colors.fontLight),
+                      style: appTheme.data.textTheme.headline6
+                          .copyWith(color: appTheme.colors.fontLight),
                     ),
                   ),
                 );
@@ -326,13 +330,16 @@ class _LoginFormInput extends StatelessWidget {
     var appTheme = context.getTheme();
     var suffixIconWidget = suffixIcon != null
         ? FieldButton(
-            onTab: onTabSuffixIcon, iconData: suffixIcon, iconEnabledColor: appTheme.colors.fontPale.lighten(0.3))
+            onTab: onTabSuffixIcon,
+            iconData: suffixIcon,
+            iconEnabledColor: appTheme.colors.fontPale.lighten(0.3))
         : null;
     return TextFormField(
       decoration: DenseInputDecoration(
           hintText: hintText,
           helperText: ' ',
-          prefixIcon: Icon(prefixIcon, color: appTheme.colors.primary.lighten(0.3), size: 18),
+          prefixIcon: Icon(prefixIcon,
+              color: appTheme.colors.primary.lighten(0.3), size: 18),
           suffixIcon: suffixIconWidget),
       focusNode: focusNode,
       validator: RequiredValidator<String>(errorText: AppString.requiredField),
@@ -341,6 +348,7 @@ class _LoginFormInput extends StatelessWidget {
       controller: controller,
       obscureText: obscureText,
       onFieldSubmitted: onFieldSubmitted,
+      enableInteractiveSelection: false,
     );
   }
 }

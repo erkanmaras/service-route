@@ -2,6 +2,8 @@ PODS:
   - device_info (0.0.1):
     - Flutter
   - Flutter (1.0.0)
+  - geolocator (6.1.9):
+    - Flutter
   - google_maps_flutter (0.0.1):
     - Flutter
     - GoogleMaps (< 3.10)
@@ -12,13 +14,9 @@ PODS:
     - GoogleMaps/Base
   - image_picker (0.0.1):
     - Flutter
-  - locator (0.0.1):
-    - Flutter
   - package_info (0.0.1):
     - Flutter
   - path_provider (0.0.1):
-    - Flutter
-  - "permission_handler (5.0.1+1)":
     - Flutter
   - wakelock (0.0.1):
     - Flutter
@@ -26,12 +24,11 @@ PODS:
 DEPENDENCIES:
   - device_info (from `.symlinks/plugins/device_info/ios`)
   - Flutter (from `Flutter`)
+  - geolocator (from `.symlinks/plugins/geolocator/ios`)
   - google_maps_flutter (from `.symlinks/plugins/google_maps_flutter/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
-  - locator (from `.symlinks/plugins/locator/ios`)
   - package_info (from `.symlinks/plugins/package_info/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
-  - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
   - wakelock (from `.symlinks/plugins/wakelock/ios`)
 
 SPEC REPOS:
@@ -43,33 +40,30 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/device_info/ios"
   Flutter:
     :path: Flutter
+  geolocator:
+    :path: ".symlinks/plugins/geolocator/ios"
   google_maps_flutter:
     :path: ".symlinks/plugins/google_maps_flutter/ios"
   image_picker:
     :path: ".symlinks/plugins/image_picker/ios"
-  locator:
-    :path: ".symlinks/plugins/locator/ios"
   package_info:
     :path: ".symlinks/plugins/package_info/ios"
   path_provider:
     :path: ".symlinks/plugins/path_provider/ios"
-  permission_handler:
-    :path: ".symlinks/plugins/permission_handler/ios"
   wakelock:
     :path: ".symlinks/plugins/wakelock/ios"
 
 SPEC CHECKSUMS:
   device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  geolocator: 057a0c63a43e9c5296d8ad845a3ac8e6df23d899
   google_maps_flutter: c7f9c73576de1fbe152a227bfd6e6c4ae8088619
   GoogleMaps: 4b5346bddfe6911bb89155d43c903020170523ac
   image_picker: 9c3312491f862b28d21ecd8fdf0ee14e601b3f09
-  locator: c8a6221bfad16ff3021f962397cabe1e3cef3740
   package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
-  permission_handler: eac8e15b4a1a3fba55b761d19f3f4e6b005d15b6
   wakelock: bfc7955c418d0db797614075aabbc58a39ab5107
 
-PODFILE CHECKSUM: 8204def8a6d7fb0b364525deced826fc50e844ba
+PODFILE CHECKSUM: e9df29db149926d384bc9b1cfecddade5778e31a
 
 COCOAPODS: 1.9.3
