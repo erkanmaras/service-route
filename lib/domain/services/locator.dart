@@ -19,7 +19,8 @@ class Locator {
     updateIntervalInSecond ??= 10;
     locationErrorLogRight = 5;
 
-    callBack(await getCurrentPosition());
+   await callBack(await getCurrentPosition());
+   
     positionStream = Geolocator.getPositionStream(
             desiredAccuracy: LocationAccuracy.bestForNavigation,
             distanceFilter: 20,

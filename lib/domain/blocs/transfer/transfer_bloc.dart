@@ -100,9 +100,10 @@ class TransferBloc extends Cubit<TransferState> {
     try {
       locationErrorLogRight = 5;
       pointErrorLogRight = 5;
-      
-      await locator.start(callBack: addRouteLocation, updateIntervalInSecond: mapUpdateIntervalInSecond);
+
       await deleteFile();
+      await locator.start(callBack: addRouteLocation, updateIntervalInSecond: mapUpdateIntervalInSecond);
+
       emit(state.copyWith(locating: true));
     } on AppException catch (e, s) {
       emit(TransferFailState(reason: e.message, state: state));
@@ -223,7 +224,8 @@ class TransferFile {
             longitude: entry.longitude,
             name: AppString.startPoint,
           ).toString(),
-          mode: FileMode.append);
+          mode: FileMode.append,flush: true);
+          
       emptyFile = false;
     }
     await file.writeAsString(entry.toString(), mode: FileMode.append);
@@ -256,8 +258,11 @@ class TransferFile {
   }
 
   Future<void> delete() async {
-    final file = await getFile();
-    await file.delete();
+    final path = await _getFilePath();
+    final file = File(path);
+    if (file.existsSync()) {
+        await file.delete();
+    }
   }
 }
 
@@ -274,7 +279,7 @@ class TransferFileEntry {
     var line = StringBuffer();
     line.write('${locationType.index},$latitude,$longitude');
     if (locationType.index == LocationType.point.index) {
-      line.write(',"${name ?? ""}",${Clock().now().toIso8601String()}');
+      line.write(',${name ?? ""},${Clock().now().toIso8601String()}');
     }
 
     line.writeln();

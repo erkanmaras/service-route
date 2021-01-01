@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:service_route/domain/domain.dart';
 import 'package:intl/intl.dart';
+import 'package:service_route/infrastructure/infrastructure.dart';
 
 class TransferResultState {}
 
@@ -31,32 +33,56 @@ class TransferSummary {
   // ignore: prefer_constructors_over_static_methods
   static TransferSummary readTransferFile(String fileContent) {
     var lines = LineSplitter.split(fileContent).toList();
-    var startDate = DateTime.parse(lines.first.split(',')[4]);
-    var endDate = DateTime.parse(lines.last.split(',')[4]);
     double totalDistance = 0;
     int totalPassengers = 0;
+    List<LatLng> locations = <LatLng>[];
+    String startLine;
+    String endLine;
 
-    //skip first and last line(start,end time info)
-    var startIndex = 1;
-    var endIndex = lines.length - 1;
-    for (var i = startIndex; i < endIndex; i++) {
+    for (var i = 0; i < lines.length; i++) {
       var line = lines[i];
+
+      if (!(line.startsWith(LocationType.point.index.toString()) ||
+          line.startsWith(LocationType.route.index.toString()))) {
+        continue;
+      }
+
+      try {
+        var lineSplit = line.split(',');
+        locations.add(LatLng(double.parse(lineSplit[1]), double.parse(lineSplit[2])));
+      } catch (e) {
+        throw AppError(message: 'Invalid transfer file line: \n $line');
+      }
+
       if (line.startsWith(LocationType.point.index.toString())) {
+        if (startLine == null && line.contains(AppString.startPoint)) {
+          startLine = line;
+          continue;
+        }
+
+        if (line.contains(AppString.endPoint)) {
+          endLine = line;
+          continue;
+        }
+
         totalPassengers++;
       }
+    }
 
-      if (i < endIndex - 1) {
-        var nextLine = lines[i + 1];
-        var line1Split = line.split(',');
-        var line2Split = nextLine.split(',');
-        var lat1 = double.parse(line1Split[1]);
-        var lng1 = double.parse(line1Split[2]);
-        var lat2 = double.parse(line2Split[1]);
-        var lng2 = double.parse(line2Split[2]);
-
-        totalDistance += Locator.distanceBetween(lat1, lng1, lat2, lng2);
+    for (var i = 0; i < locations.length; i++) {
+      var p1 = locations[i];
+      if (i < locations.length - 1) {
+        var p2 = locations[i + 1];
+        totalDistance += Locator.distanceBetween(p1.latitude, p1.longitude, p2.latitude, p2.longitude);
       }
     }
+
+    if (startLine.isNullOrEmpty() || startLine.isNullOrEmpty()) {
+      throw AppError(message: 'Invalid Transfer File startLine || startLine Empty');
+    }
+
+    DateTime startDate = DateTime.parse(startLine.split(',')[4]);
+    DateTime endDate = DateTime.parse(endLine.split(',')[4]);
 
     return TransferSummary(
       distanceInMeters: totalDistance,
